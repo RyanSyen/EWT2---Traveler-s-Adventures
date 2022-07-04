@@ -1,0 +1,196 @@
+<template id="addWeapon">
+    <div>
+        <h1>Add New Weapon</h1>
+
+        <form class="form" @submit.prevent="submit">
+            <label>Name</label>
+            <input v-model.trim="name"
+                   required
+                   maxlength="80"
+                   v-focus
+                   @input="validateName"
+                   ref="name">
+
+            <label>Rarity</label>
+            <input v-model.trim="rarity"
+                   required
+                   type="number"
+                   @input="validateRarity">
+
+            <label>Damage</label>
+            <input v-model.trim="dmg"
+                   required
+                   type="number"
+                   @input="validateDmg">
+            
+            <label>Bonus Damage</label>
+            <input v-model.trim="bonus_dmg"
+                   required
+                   type="number"
+                   @input="validateBonusDmg">
+
+            <label>Bonus Rate</label>
+            <input v-model.trim="bonus_rate"
+                   required
+                   type="number"
+                   @input="validateBonusRate">
+
+            <label>Bonus HP</label>
+            <input v-model.trim="bonus_hp"
+                   required
+                   type="number"
+                   @input="validateBonusHP">
+                
+            <label>Photo</label>
+            <input type="file" 
+                   accept="image/*"
+                   required
+                   @change="change"
+                   ref="file">
+
+            <label></label>
+            <img :src="photo || temp" class="photo">
+
+            <section>
+                <button>Insert</button>
+                <button @click.prevent="reset">Reset</button>
+                <button @click.prevent="$router.push('/')">Cancel</button>
+            </section>
+        </form>
+    </div>
+</template>
+
+<script>
+    Vue.component('addWeapon', {
+        template: '#addWeapon',
+        data: () => ({ 
+            name : '',
+            rarity : '',
+            dmg : '',
+            bonus_dmg : '',
+            bonus_rate : '',
+            bonus_hp : '',
+            photo: '',
+            temp : 'image/photo.png'
+        }),
+        methods: {
+            change(e) {
+                let f = e.target.files[0];
+
+                crop(f, 200, 200, 'dataURL', 'image/webp')
+                    .then(dataURL => this.photo = dataURL)
+                    .catch(err => this.photo = e.target.value = '');
+            },
+            validateName(e) {
+                let el = e.target;
+                let name = el.value;
+
+                el.setCustomValidity('');
+                if(el.validity.valid) {
+                    let f = this.$root.weapons.find(f => f.name == name);
+                    if(f) {
+                        el.setCustomValidity('Duplicated Weapon Name.');
+                    }
+                }
+            },
+            validateRarity(e) {
+                let el = e.target;
+                let rarity = el.value;
+
+                el.setCustomValidity('');
+                if(el.validity.valid) {
+                    if(rarity < 1) {
+                        el.setCustomValidity('Rarity Should AT LEAST 1.');
+                    }
+                    else if(rarity > 5) {
+                        el.setCustomValidity('Rarity Only Between (1 - 5).');
+                    }
+                }
+            },validateDmg(e) {
+                let el = e.target;
+                let dmg = el.value;
+
+                el.setCustomValidity('');
+                if(el.validity.valid) {
+                    if(dmg < 10) {
+                        el.setCustomValidity('Damage Should AT LEAST 10.');
+                    }
+                    else if(dmg > 50) {
+                        el.setCustomValidity('Damage Only Between (10 - 50).');
+                    }
+                }
+            },validateBonusDmg(e) {
+                let el = e.target;
+                let bonusDmg = el.value;
+
+                el.setCustomValidity('');
+                if(el.validity.valid) {
+                    if(bonusDmg < 0) {
+                        el.setCustomValidity('Bonus Damage Should AT LEAST 0.');
+                    }
+                    else if(bonusDmg > 95) {
+                        el.setCustomValidity('Bonus Damage Only Between (0 - 95).');
+                    }
+                }
+            },
+            validateBonusRate(e) {
+                let el = e.target;
+                let bonusRate = el.value;
+
+                el.setCustomValidity('');
+                if(el.validity.valid) {
+                    if(bonusRate < 0) {
+                        el.setCustomValidity('Bonus Rate Should AT LEAST 0.');
+                    }
+                    else if(bonusRate > 50) {
+                        el.setCustomValidity('Bonus Rate Only Between (0 - 50).');
+                    }
+                }
+            },
+            validateBonusHP(e) {
+                let el = e.target;
+                let bonusHP = el.value;
+
+                el.setCustomValidity('');
+                if(el.validity.valid) {
+                    if(bonusHP < 0) {
+                        el.setCustomValidity('Bonus HP Should AT LEAST 0.');
+                    }
+                    else if(bonusHP > 75) {
+                        el.setCustomValidity('Bonus HP Only Between (0 - 75).');
+                    }
+                }
+            },
+            submit() { 
+                ref.doc().set({
+                    name: this.name,
+                    rarity: this.rarity,
+                    dmg: this.dmg,
+                    bonus_dmg: this.bonus_dmg,
+                    bonus_rate: this.bonus_rate,
+                    bonus_hp: this.bonus_hp,
+                    photo: this.photo
+                });
+                if(true){
+                    alert('Weapon Successfully Added.');
+                    this.$router.push('/');
+                }
+            },
+            reset() {
+                this.name = '';
+                this.rarity = '';
+                this.dmg = '';
+                this.bonus_dmg = '';
+                this.bonus_rate = '';
+                this.bonus_hp = '';
+                this.photo = '';
+                this.$refs.file.value = '';
+                this.$refs.name.focus();
+            }
+        },
+
+        created() {
+            document.title = 'Add New Weapon';
+        }
+    });
+</script>

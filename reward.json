@@ -1,0 +1,26 @@
+[
+  {
+    "name" : "Sword",
+    "photo": "image/reward.png"
+  },
+  {
+    "name" : "50 EXP",
+    "photo": "image/reward.png"
+  },
+  {
+    "name" : "High Sword",
+    "photo": "image/reward.png"
+  },
+  {
+    "name" : "100 EXP",
+    "photo": "image/reward.png"
+  },
+  {
+    "name" : "150 EXP",
+    "photo": "image/reward.png"
+  },
+  {
+    "name" : "200 EXP",
+    "photo": "image/reward.png"
+  }
+]

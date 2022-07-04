@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="image/logo1.png">
+    <link rel="stylesheet" href="css/app3.css">
+    <title>Traveler's Adventures</title>
+    <style>
+        .reward {
+            margin: 0 5px 5px 0;
+            width: 128px;
+            height: 128px;
+            position: relative;
+            float: left;
+        }
+
+        .reward img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .reward img:hover {
+            cursor: pointer;
+        }
+
+        .reward div {
+            position: absolute;
+            bottom: 0%;
+            background: #0009;
+            color: #fff;
+            width: 100%;
+            text-align: center;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+
+        .timer {
+            font-family: sans-serif;
+            display: inline-block;
+            /* padding: 24px 32px; */
+            padding: 20px 0;
+            border-radius: 30px;
+            background: white;
+            color: red;
+        }
+
+        .timer__part {
+            font-size: 36px;
+            font-weight: bold;
+        }
+
+        .timer__btn {
+            width: 50px;
+            height: 50px;
+            margin-left: 16px;
+            border-radius: 50%;
+            border: none;
+            color: white;
+            background: #8208e6;
+            cursor: pointer;
+        }
+
+        .timer__btn--start {
+            background: #00b84c;
+        }
+
+        .timer__btn--stop {
+            background: #ff0256;
+        }
+
+        #delete {
+            font-size: large;
+            padding: 0.5em 1em;
+        }
+
+        .modal-container {
+            z-index: 9999;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-open {
+            display: flex;
+        }
+
+        .modal {
+            max-width: 700px;
+            max-height: 400px;
+            background-color: white;
+            border-radius: 3px;
+        }
+
+        .modal-button {
+            text-transform: uppercase;
+            padding: 0.5em 1em;
+            border: none;
+            color: #fff;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 3px;
+            margin-left: 0.5em;
+        }
+
+        .modal-confirm-button {
+            background-color: tomato;
+            cursor: pointer;
+        }
+
+        .modal-header {
+            background-color: rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header h2 {
+            margin: 1em;
+        }
+
+        .modal-header span {
+            padding-right: 0.3em;
+            cursor: default;
+            align-self: flex-end;
+        }
+
+        .modal-content {
+            padding: 1em;
+            flex-grow: 1;
+        }
+
+        .modal-footer {
+            padding: 1em;
+            background-color: rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .close-button {
+            border: none;
+            text-align: center;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .departure {
+            font-size: 1.5em;
+        }
+
+        #countdown {
+            padding: 5px;
+            border: 1px solid black;
+            display: inline-block;
+            padding: 14px;
+            border-radius: 5px;
+        }
+
+        .departure #countdown .span {
+            display: inline-block;
+        }
+
+        .departure .hours,
+        .departure .minutes,
+        .departure .seconds {
+            color: #fff;
+            background: #000;
+            background: linear-gradient(to top, #444 0%, #444 50%, #000 50%, #000 100%);
+            border-radius: 6px;
+            padding: 10px;
+            font-family: arial;
+        }
+
+        .departure .hSep,
+        .departure .mSep {
+            padding: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1><a href="_worldmap.html">Traveler's Adventures</a></h1>
+    </header>
+
+    <nav>
+        <a href="_worldmap.html">World Map 🗺️</a>
+        <a href="_game.html">Base 🏡</a>
+        <a href="_character.html">My Characters 🎮</a>
+        <a href="_myweapons.html">My Weapons ⚔️</a>
+        <a href="_leaderboard.html">Leaderboard 📈</a>
+        <a href="_enemy.html">Enemy Book 😈</a>
+        <a href="_weapons.html">Weapons Book ⚔️</a>
+        <a href="_dailyRewards.html">Daily Rewards 🎁</a>
+        <a href="index.html">Logout 🔓</a>
+    </nav>
+
+    <main id="app" v-cloak>
+        <h1>Daily Rewards</h1>
+        <!-- <p>Today Date: <b id="today"></b></p> -->
+        <h3>Next Reward in :</h3>
+        <div class="departure"><span id="countdown"></span></div>
+        <br />
+        <div id="countdown-two" style="opacity: 0;"></div>
+        <div class="timer" style="opacity: 0; "></div>
+
+        <!-- modal -->
+        <div id="confirmation" class="modal-container">
+            <div class="modal">
+                <section>
+                    <h1 class="modal-content"></h1>
+                    <div class="modal-footer">
+                        <button class="modal-button modal-confirm-button" onclick="onConfirm()" id="startTimer">
+                            Confirm
+                        </button>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <transition-group tag="div" name="fade" appear>
+            <!-- <div v-if="status" style="pointer-events: auto;" class="reward" v-for="u of result" :key="u.name" v-on:click="display">
+                <img :src="u.photo" :id="u.name">
+                <div style="display: none;" class="n">{{ u.name }}</div>
+                <div>{{ u.name }}</div>
+            </div>
+            <div v-else="status" style="pointer-events: none;" class="reward" v-for="u of result" :key="u.name" v-on:click="display">
+                <img :src="u.photo" :id="u.name">
+                <div style="display: none;" class="n">{{ u.name }}</div>
+                <div>{{ u.name }}</div>
+            </div> -->
+            <div class="reward" v-for="u of result" :key="u.name" v-on:click="display">
+                <img :src="u.photo" :id="u.name">
+                <!-- <div style="display: none;" class="n">{{ u.name }}</div> -->
+                <!-- <div>{{ u.name }}</div> -->
+            </div>
+        </transition-group>
+
+        <!-- <div id="bb">
+        </div> -->
+
+
+    </main>
+    <script
+    src="https://maps.googleapis.com/maps/api/js?streetview?size=600x300&location=46.414382,10.013988&heading=151.78&pitch=-0.76&staticmap?lAFt_SGN_RE0C842ylvCMIEx0Wk=&libraries=geometry,drawing&key=AIzaSyAClsRoluVheRdIQyDqqgGRFvX3rx55cfA">
+</script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key="></script>
+    <script src="js/jquery.slim.js"></script>
+    <script src="js/vue.js"></script>
+
+    <script>
+        firebase.initializeApp({
+            projectId: 'apiwebservice-340215'
+        });
+
+        const db = firebase.firestore();
+        const ref = db.collection('refreshTimer');
+
+
+        const app = new Vue({
+            el: '#app',
+            data: {
+                users: [],
+                query: '',
+                hour: '',
+                minute: '',
+                second: '',
+                status: false,
+                //refreshTimer: true,
+            },
+            firestore: {
+                refreshTimer: ref
+            },
+            computed: {
+                result() {
+                    let arr = this.users.slice();
+                    let q = this.query.toLowerCase();
+                    arr = arr.filter(u => u.name.toLowerCase().includes(q));
+                    return arr;
+                },
+            },
+            methods: {
+                shuffle() {
+                    this.users.sort(() => Math.random() - 0.5);
+                },
+                display(e) {
+                    let el = e.target.id;
+                    let confirmation = document.getElementById("confirmation");
+
+                    for (r of this.users) {
+                        switch (el) {
+                            case "Sword":
+                                if (!confirmation.classList.contains("modal-open")) {
+                                    confirmation.classList.add("modal-open");
+                                    $('.modal-content').text('Congratulations. You Award "Sword".');
+                                }
+                                return;
+                                break;
+                            case "High Sword":
+                                if (!confirmation.classList.contains("modal-open")) {
+                                    confirmation.classList.add("modal-open");
+                                    $('.modal-content').text('Congratulations. You Award "High Sword".');
+                                }
+                                return;
+                                break;
+                            case "50 EXP":
+                                if (!confirmation.classList.contains("modal-open")) {
+                                    confirmation.classList.add("modal-open");
+                                    $('.modal-content').text('Congratulations. You Award "50 EXP".');
+                                }
+                                return;
+                                break;
+                            case "100 EXP":
+                                if (!confirmation.classList.contains("modal-open")) {
+                                    confirmation.classList.add("modal-open");
+                                    $('.modal-content').text('Congratulations. You Award "100 EXP".');
+                                }
+                                return;
+                                break;
+                            case "150 EXP":
+                                if (!confirmation.classList.contains("modal-open")) {
+                                    confirmation.classList.add("modal-open");
+                                    $('.modal-content').text('Congratulations. You Award "150 EXP".');
+                                }
+                                return;
+                                break;
+                            case "200 EXP":
+                                if (!confirmation.classList.contains("modal-open")) {
+                                    confirmation.classList.add("modal-open");
+                                    $('.modal-content').text('Congratulations. You Award "200 EXP".');
+                                }
+                                return;
+                                break;
+                        }
+                    }
+                },
+            },
+
+            created() {
+                fetch('reward.json')
+                    .then(resp => resp.json())
+                    .then(json => this.users = json);
+                window.addEventListener("load", this.shuffle);
+            }
+        });
+
+        //modal
+        function onConfirm() {
+            //onCancel();
+            let confirmation = document.getElementById("confirmation");
+            confirmation.classList.remove("modal-open");
+
+            $(".reward").css("pointer-events", "none");
+            this.status = false;
+            ref.doc("time").set({
+                status: false
+            });
+
+            /* ref.doc("time").get().then(doc => {
+                //status: this.status
+                this.status = status;
+            }); */
+
+
+        }
+
+        // function onCancel() {
+        //     let confirmation = document.getElementById("confirmation");
+        //     confirmation.classList.remove("modal-open");
+        //     this.refreshTimer = true;
+        //     ref.doc("time").set({
+        //         status: this.refreshTimer
+        //     });
+        //     //$(".reward").css("pointer-events", "auto");
+        // }
+
+        //timer
+        /* class Timer {
+            constructor(root) {
+                root.innerHTML = Timer.getHTML();
+
+                this.el = {
+                    hours: root.querySelector(".timer__part--hours"),
+                    minutes: root.querySelector(".timer__part--minutes"),
+                    seconds: root.querySelector(".timer__part--seconds"),
+                    control: root.querySelector(".timer__btn--control"),
+                    reset: root.querySelector(".timer__btn--reset")
+                };
+
+                this.interval = null;
+                this.remainingSeconds = 0;
+                this.remainingMinutes = 0;
+
+                document.getElementById('startTimer').addEventListener('click', (event) => {
+                    this.start();
+                });
+                window.addEventListener("load", (event) => {
+                    const inputHours = 24;
+
+                    if (inputHours < 25) {
+                        this.stop();
+                        this.remainingSeconds = inputHours * 60 * 60;
+
+                        this.updateInterfaceTime();
+                    }
+                    const today = new Date()
+                    const tomorrow = new Date(today)
+                    tomorrow.setDate(tomorrow.getDate() + 1)
+                    console.log(today);
+                    console.log(tomorrow);
+                });
+            }
+
+            updateInterfaceTime() {
+                const hours = Math.floor(this.remainingSeconds / 60 / 60);
+                const minutes = Math.floor(this.remainingSeconds / 60 % 60);
+                const seconds = this.remainingSeconds % 60;
+
+                this.el.hours.textContent = hours.toString().padStart(2, "0");
+                this.el.minutes.textContent = minutes.toString().padStart(2, "0");
+                this.el.seconds.textContent = seconds.toString().padStart(2, "0");
+            }
+
+            start() {
+                if (this.remainingSeconds === 0) return;
+
+                this.interval = setInterval(() => {
+                    this.remainingSeconds--;
+                    this.updateInterfaceTime();
+
+                    if (this.remainingSeconds === 0) {
+                        this.stop();
+                    }
+                }, 1000);
+            }
+
+            stop() {
+                clearInterval(this.interval);
+
+                this.interval = null;
+
+                const inputHours = 24;
+                this.remainingSeconds = inputHours * 60 * 60;
+                this.updateInterfaceTime();
+
+                $(".n").css("display", "none");
+                $(".reward").css("pointer-events", "auto")
+
+                window.addEventListener("click", this.display);
+            }
+
+            static getHTML() {
+                return `
+              <span class="timer__part">Next Reward Countdown : </span>
+              <span class="timer__part timer__part--hours">00</span>
+              <span class="timer__part">:</span>
+              <span class="timer__part timer__part--minutes">00</span>
+              <span class="timer__part">:</span>
+              <span class="timer__part timer__part--seconds">00</span>
+          `;
+            }
+        }
+
+        new Timer(
+            document.querySelector(".timer")
+        ); */
+
+        // var div = document.getElementById("bb");
+
+        // setInterval(function () {
+        //     var toDate = new Date();
+        //     //console.log(toDate)
+        //     var tomorrow = new Date();
+        //     //console.log(tomorrow)
+        //     tomorrow.setHours(24, 0, 0, 0);
+        //     //tomorrow.setHours(24);
+        //     var diffMS = tomorrow.getTime() / 1000 - toDate.getTime() / 1000;
+        //     var diffHr = Math.floor(diffMS / 3600);
+        //     diffMS = diffMS - diffHr * 3600;
+        //     var diffMi = Math.floor(diffMS / 60);
+        //     diffMS = diffMS - diffMi * 60;
+        //     var diffS = Math.floor(diffMS);
+        //     var result = ((diffHr < 10) ? "0" + diffHr : diffHr);
+        //     result += ":" + ((diffMi < 10) ? "0" + diffMi : diffMi);
+        //     result += ":" + ((diffS < 10) ? "0" + diffS : diffS);
+        //     div.innerHTML = result;
+
+        // }, 1000);
+
+        const Countdown = (() => {
+
+            let nextMidnight = new Date();
+            nextMidnight.setHours(4, 33, 0, 0);
+
+            const getRemainingTime = () => {
+                let now = new Date();
+                var currentDateTime = new Date();
+                var resultInSeconds = currentDateTime.getTime() / 1000;
+
+                let time = (nextMidnight.getTime() - now.getTime()) / 1000;
+                //console.log(nextMidnight.getTime())
+
+
+                if (time < 0) {
+                    nextMidnight = new Date();
+                    nextMidnight.setHours(24, 0, 0, 0);
+                    this.nextRefresh = true;
+                    ref.doc("time").set({
+                        status: true,
+                    });
+                    $(".reward").css("pointer-events", "auto");
+
+                    /* if(resultInSeconds == 0){
+                    alert("test")
+                    console.log("walau")
+                    this.nextRefresh = true;
+                    
+                } */
+                    return getRemainingTime();
+                }
+
+
+                // if (this.nextRefresh == true) {
+                //     alert("test")
+                //     $(".reward").css("pointer-events", "auto");
+                // }
+
+                return time;
+            }
+
+            const parseTime = (time) => {
+                const hours = Math.floor(time / 3600);
+                let rest = time - (hours * 3600);
+                const minutes = Math.floor(rest / 60);
+                rest = rest - (minutes * 60);
+                const seconds = Math.floor(rest);
+                const milliseconds = (rest - seconds) * 1000;
+
+                return [hours, minutes, seconds, milliseconds];
+            };
+
+            const formatTime = (parsedTime) => {
+                return '<span class="hours">' + parsedTime[0] +
+                    '</span><span class="hSep">:</span><span class="minutes">' + ("0" + parsedTime[1])
+                    .slice(-2) + '</span><span class="mSep">:</span><span class="seconds">' + ("0" +
+                        parsedTime[2]).slice(-2) + '</span>';
+            };
+
+            const els = [];
+            let timeout;
+
+            return (el) => {
+                els.push(el);
+
+                if (!timeout) {
+
+                    const refresh = () => {
+                        const parsedTime = parseTime(getRemainingTime());
+                        const formattedTimes = formatTime(parsedTime);
+
+                        for (let i = 0, iend = els.length; i < iend; i++) {
+                            els[i].innerHTML = formattedTimes;
+                            //$(".reward").css("pointer-events", "auto");
+                        }
+
+                        setTimeout(() => {
+                            refresh();
+                        }, parsedTime[3]);
+                    };
+                    refresh();
+
+                } else el.innerHTML = formatTime(parseTime(getRemainingTime()));
+            };
+
+        })();
+
+        Countdown(document.getElementById('countdown'));
+        Countdown(document.getElementById('countdown-two'));
+
+        window.onload = (event) => {
+            // ref.doc("time").get().then(doc => {
+            //     //status: this.status
+            //     this.refreshTimer = status;
+            // });
+            // console.log(this.refreshTimer);
+            readStatus();
+            
+            // db.collection('refreshTimer').doc("time").get().then(doc => {
+            //     alert("page loaded")
+            //    /*   this.refreshTimer = doc.data().status;
+            //      console.log(this.refreshTimer)
+            //      doc.data().status;
+            //      console.log(doc.data().status); */
+            //     ;
+            //  });
+        };
+
+        function readStatus(){
+            ref.doc("time").get().then(doc => {
+                //status: this.status
+                this.status = status;
+                console.log(this.status);
+            });
+            
+        }
+    </script>
+</body>
+
+</html>

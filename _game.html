@@ -1,0 +1,4134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="image/logo1.png">
+    <link rel="stylesheet" href="css/app3.css">
+    <title>Traveler's Adventures</title>
+    <style>
+        main {
+            display: grid;
+        }
+
+        #map {
+            border: 1px solid #333;
+        }
+
+        #panel {
+            background-color: #fff;
+            border: 1px solid #999;
+            border-radius: 5px;
+            margin: 5px;
+            padding: 5px;
+            font-size: 16px;
+            height: 300px;
+            overflow: auto;
+        }
+
+        #panel img {
+            width: 24px;
+        }
+
+        #panel * {
+            vertical-align: middle;
+        }
+
+        .ccontainer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .monstername {
+            /* font-size: large; */
+            font-weight: 500;
+        }
+
+        .characterStats {
+            width: 150px;
+            background-color: #fff;
+            border: 1px solid #999;
+            border-radius: 5px;
+            /* margin: 5px; */
+            padding: 7px;
+            display: flex;
+            /* justify-content: center;
+            align-items: center; */
+            flex-direction: column;
+        }
+
+        .userStats {
+            display: flex;
+            flex-direction: row;
+
+        }
+
+        .progressBar {
+            width: 90px;
+            background-color: #333;
+            margin-top: 5px;
+        }
+
+        #mapPanel img {
+            width: 100px;
+            height: 100px;
+            cursor: pointer;
+        }
+
+        .departure {
+            font-size: 1.5em;
+        }
+
+        #countdown {
+            padding: 5px;
+            /* border: 1px solid black; */
+            display: inline-block;
+            padding: 14px;
+            border-radius: 5px;
+        }
+
+        .departure #countdown .span {
+            display: inline-block;
+        }
+
+        .departure .hours,
+        .departure .minutes,
+        .departure .seconds {
+            color: #fff;
+            background: #000;
+            background: linear-gradient(to top, #444 0%, #444 50%, #000 50%, #000 100%);
+            border-radius: 6px;
+            padding: 5px;
+            font-family: arial;
+        }
+
+        .departure .hSep,
+        .departure .mSep {
+            padding: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1><a href="_game.html">World Map</a></h1>
+        <div style="display: flex; position: absolute; top: 0; right: 0;">
+            <h3>Next Monster Spawn :</h3>
+            <div style="height: 10px;" class="departure"><span id="countdown"></span></div>
+            <br />
+            <div id="countdown-two" style="opacity: 0; height: 0px"></div>
+        </div>
+    </header>
+
+    <nav>
+        <a href="_game.html">Base 🏡</a>
+        <a href="_character.html">My Characters 🎮</a>
+        <a href="_myweapons.html">My Weapons ⚔️</a>
+        <a href="_leaderboard.html">Leaderboard 📈</a>
+        <a href="_enemy.html">Enemy Book 😈</a>
+        <a href="_weapons.html">Weapons Book ⚔️</a>
+        <a href="_dailyRewards.html">Daily Rewards 🎁</a>
+        <a href="index.html">Logout 🔓</a>
+    </nav>
+
+
+
+    <!-- Vue ----------------------------------------------------------------->
+    <main id="app" v-cloak>
+        <div id="map"></div>
+
+        <div hidden>
+            <div id="mapPanel">
+                <img src="image\treasuremap.png" @click="goToWorldMap">
+            </div>
+            <div id="panel">
+                <b>Nearby Loots</b>
+                <p style="height: 8px; margin: 0; padding: 0;"></p>
+                <div v-for="m of markers">
+                    <img :src="m.icon.url" @click="locateChest(m.label.text)">
+                    <span v-if="m.found">Found</span>
+                    <span v-else>{{ m.distance | number(0) }} meters</span>
+                </div>
+                <div v-for="e of easy">
+                    <img :src="e.icon.url">
+                    <span v-if="e.found">Found</span>
+                    <span v-else>{{ e.distance | number(0) }} meters</span>
+                </div>
+                <div v-for="d of medium">
+                    <img :src="d.icon.url">
+                    <span v-if="d.found">Found</span>
+                    <span v-else>{{ d.distance | number(0) }} meters</span>
+                </div>
+                <div v-for="e of boss">
+                    <img :src="e.icon.url">
+                    <span v-if="e.found">Found</span>
+                    <span v-else>{{ e.distance | number(0) }} meters</span>
+                </div>
+            </div>
+            <div id="characterPanel" class="characterStats">
+                <div class="userStats">
+                    <!-- default character is the traveler, later only allow choose character -->
+                    <!-- <img :src="m.icon.url"> -->
+                    <img v-bind:src="characterImg" alt="traveler" style="width: 50px; height: 50px;" id="playericon">
+                    <!-- <img v-if="player" src="image/traveler.png" alt="traveler" style="width: 50px; height: 50px;"
+                        id="playericon">
+                    <img v-else="player" src="image/Lumine.png" alt="traveler" style="width: 50px; height: 50px;"
+                        id="playericon"> -->
+
+                    <!-- alive then show 💖, dead then show 😵 -->
+                    <div style="padding-left: 5px;">
+                        <b style="font-size: large; ">{{username}}</b>
+                        <div class="progressBar">
+                            <div class="progress" style="height:20px; width:1%; background-color: red;"></div>
+                            <p style="position: absolute; top: 27px; right: 45px; color: white;">EXP</p>
+                        </div>
+                    </div>
+
+                </div>
+                <br>
+
+                <b>Health: {{characterHealth}}</b><br>
+                <b>Base DMG: {{totalDmg}}</b><br>
+                <b style="display: flex; align-items: center;">Weapon: {{weaponName}} <img
+                        style="width: 40px; height: 40px; position: relative; padding-left: 10px;"
+                        v-bind:src="weaponImg"></b><br>
+                <!-- progressbar -->
+
+
+
+
+            </div>
+            <div id="info" class="cccontainer">
+                <img src="image/openedchest.png" style="width: 80px; height: 80px; padding-top: 10px">
+                <br>
+                <h3>Found a chest!</h3>
+                <button id="collectChest" @click="collectchest">Collect</button><br>
+                <br>
+                <b>Rewards</b>
+                <p>+ 15 exp</p>
+            </div>
+
+            <div id="infoEasy" class="cccontainer">
+                <img v-bind:src="captureimg1" style="width: 80px; height: 80px; padding-top: 10px">
+                <br>
+                <h3>Found a monster!</h3>
+                <button id="fightEasy" @click="fighteasy">Fight!</button>
+                <br>
+                <h4 style="font-size: large; color:red;">{{easyName}}</h4>
+                <p class="monstername">Type : Easy</p>
+                <p>Health : {{easyHealth}}</p>
+                <p>Damage : {{easyDmg}}</p>
+                <p>EXP : {{easyExp}}</p>
+            </div>
+
+            <div id="infoMedium" class="cccontainer">
+                <img v-bind:src="captureimg2" style="width: 80px; height: 80px; padding-top: 10px">
+                <br>
+                <h3>Found a monster!</h3>
+                <button id="fightMedium" @click="fightmedium">Fight!</button>
+                <br>
+                <h4 style="font-size: large; color:red;">{{mediumName}}</h4>
+                <p class="monstername">Type : Medium</p>
+                <p>Health : {{mediumHealth}}</p>
+                <p>Damage : {{mediumDmg}}</p>
+                <p>EXP : {{mediumExp}}</p>
+            </div>
+
+            <div id="infoBoss" class="cccontainer">
+                <img v-bind:src="captureimg3" style="width: 80px; height: 80px; padding-top: 10px">
+                <br>
+                <h3>Found a monster!</h3>
+                <button id="fightBoss" @click="fightboss">Fight!</button>
+                <br>
+                <h4 style="font-size: large; color:red;">{{bossName}}</h4>
+                <p class="monstername">Type : Boss</p>
+                <p>Health : {{bossHealth}}</p>
+                <p>Damage : {{bossDmg}}</p>
+                <p>EXP : {{bossExp}}</p>
+            </div>
+
+            <div id="location"
+                style="background-color: black;border: 1px solid grey ; border-radius: 10px; width: 350px; padding: 3px;">
+                <img src="image/treasure-map.png"
+                    style="width: 40px; height: 40px; padding-right: 5px; padding-left: 5px;">
+                <select v-model="type" style="position: absolute; top: 13px; width: 150px;">
+                    <!--we can change the map view provided by google-->
+                    <option value="base">🏡 Base</option>
+                    <option value="china">🧨China</option>
+                    <option value="africa">🏜️ Africa</option>
+                    <option value="us">🏈 United States</option>
+                    <option value="brazil">⚽ Brazil</option>
+                    <option value="antarctica">❄️ Antarctica</option>
+                    <option value="uk">🍵 United Kingdom</option>
+                    <option value="australia">🦘 Australia</option>
+                    <option value="hospital">🏥 Hospital</option>
+
+
+                </select>
+                <button @click="getLocation" style="position: relative; top: -13px; right: -160px;">Current
+                    Location</button>
+            </div>
+
+            <div id="mapType" style="display: none;">
+                <select v-model="mapType">
+                    <!--we can change the map view provided by google-->
+                    <option value="roadmap">Roadmap</option>
+                    <option value="satellite">Satellite</option>
+                    <option value="hybrid">Hybrid</option>
+                    <option value="terrain">Terrain</option>
+
+                </select>
+            </div>
+
+        </div>
+        <!-- <div>
+            {{ result.length }} point(s) within radius
+        </div> -->
+    </main>
+
+    <!-- <script src="https://maps.googleapis.com/maps/api/js?key=&libraries=geometry"></script> -->
+    <script
+        src="https://maps.googleapis.com/maps/api/js?streetview?size=600x300&location=46.414382,10.013988&heading=151.78&pitch=-0.76&staticmap?lAFt_SGN_RE0C842ylvCMIEx0Wk=&libraries=geometry,drawing&key=AIzaSyAClsRoluVheRdIQyDqqgGRFvX3rx55cfA">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="js/jquery.slim.js"></script>
+    <script src="js/vue.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/vuefire.js"></script>
+    <script>
+        // ====================================================================
+        // Vue
+        // ====================================================================
+
+        const audio1 = new Audio('audio/openchest.mp3');
+        const audio2 = new Audio('audio/2.mp3');
+        const audio3 = new Audio('audio/hilichurl.mp3');
+        const audio4 = new Audio('audio/boss.mp3');
+        const audio5 = new Audio('audio/yeet.mp3')
+        const audio6 = new Audio('audio/classic_hurt.mp3')
+        const audio7 = new Audio('audio/roblox-death-sound_1.mp3')
+
+        const weaponsss = [{
+                "id": "1",
+                "name": "Aquila Favonia",
+                "photo": "image\\genshin\\weapon\\5star\\Aquila_Favonia.png",
+                "rarity": "5",
+                "dmg": "48",
+                "bonus_dmg": "90",
+                "bonus_rate": "50",
+                "bonus_hp": "65"
+            },
+            {
+                "id": "2",
+                "name": "Haran Geppaku Futsu",
+                "photo": "image\\genshin\\weapon\\5star\\Haran_Geppaku_Futsu.png",
+                "rarity": "5",
+                "dmg": "46",
+                "bonus_dmg": "94",
+                "bonus_rate": "45",
+                "bonus_hp": "75"
+            },
+            {
+                "id": "3",
+                "name": "Skyward Blade",
+                "photo": "image\\genshin\\weapon\\5star\\Skyward_Blade.png",
+                "rarity": "5",
+                "dmg": "49",
+                "bonus_dmg": "92",
+                "bonus_rate": "33",
+                "bonus_hp": "70"
+            },
+            {
+                "id": "4",
+                "name": "Amenoma Kageuchi",
+                "photo": "image\\genshin\\weapon\\4star\\Amenoma_Kageuchi.png",
+                "rarity": "4",
+                "dmg": "41",
+                "bonus_dmg": "90",
+                "bonus_rate": "50",
+                "bonus_hp": "45"
+            },
+            {
+                "id": "5",
+                "name": "Blackcliff Longsword",
+                "photo": "image\\genshin\\weapon\\4star\\Blackcliff_Longsword.png",
+                "rarity": "4",
+                "dmg": "41",
+                "bonus_dmg": "84",
+                "bonus_rate": "45",
+                "bonus_hp": "42"
+            },
+            {
+                "id": "6",
+                "name": "Sacrificial Sword",
+                "photo": "image\\genshin\\weapon\\4star\\Sacrificial_Sword.png",
+                "rarity": "4",
+                "dmg": "42",
+                "bonus_dmg": "82",
+                "bonus_rate": "43",
+                "bonus_hp": "41"
+            },
+            {
+                "id": "7",
+                "name": "The Alley Flash",
+                "photo": "image\\genshin\\weapon\\4star\\The_Alley_Flash.png",
+                "rarity": "4",
+                "dmg": "45",
+                "bonus_dmg": "82",
+                "bonus_rate": "33",
+                "bonus_hp": "41"
+            },
+            {
+                "id": "8",
+                "name": "The Black Sword",
+                "photo": "image\\genshin\\weapon\\4star\\The_Black_Sword.png",
+                "rarity": "4",
+                "dmg": "43",
+                "bonus_dmg": "80",
+                "bonus_rate": "50",
+                "bonus_hp": "40"
+            },
+            {
+                "id": "9",
+                "name": "The Flute",
+                "photo": "image\\genshin\\weapon\\4star\\The_Flute.png",
+                "rarity": "4",
+                "dmg": "39",
+                "bonus_dmg": "85",
+                "bonus_rate": "55",
+                "bonus_hp": "42"
+            },
+            {
+                "id": "10",
+                "name": "Cool Steel",
+                "photo": "image\\genshin\\weapon\\3star\\Cool_Steel.png",
+                "rarity": "3",
+                "dmg": "38",
+                "bonus_dmg": "78",
+                "bonus_rate": "33",
+                "bonus_hp": "0"
+            },
+            {
+                "id": "11",
+                "name": "Dark Iron Sword",
+                "photo": "image\\genshin\\weapon\\3star\\Dark_Iron_Sword.png",
+                "rarity": "3",
+                "dmg": "40",
+                "bonus_dmg": "70",
+                "bonus_rate": "45",
+                "bonus_hp": "0"
+            },
+            {
+                "id": "12",
+                "name": "Fillet Blade",
+                "photo": "image\\genshin\\weapon\\3star\\Fillet_Blade.png",
+                "rarity": "3",
+                "dmg": "37",
+                "bonus_dmg": "75",
+                "bonus_rate": "45",
+                "bonus_hp": "0"
+            },
+            {
+                "id": "13",
+                "name": "Harbinger of Dawn",
+                "photo": "image\\genshin\\weapon\\3star\\Harbinger_of_Dawn.png",
+                "rarity": "3",
+                "dmg": "32",
+                "bonus_dmg": "80",
+                "bonus_rate": "43",
+                "bonus_hp": "0"
+            },
+            {
+                "id": "14",
+                "name": "Skyrider Sword",
+                "photo": "image\\genshin\\weapon\\3star\\Skyrider_Sword.png",
+                "rarity": "3",
+                "dmg": "35",
+                "bonus_dmg": "82",
+                "bonus_rate": "33",
+                "bonus_hp": "0"
+            },
+            {
+                "id": "15",
+                "name": "Traveler's Handy Sword",
+                "photo": "image\\genshin\\weapon\\3star\\Traveler's_Handy_Sword.png",
+                "rarity": "3",
+                "dmg": "34",
+                "bonus_dmg": "79",
+                "bonus_rate": "50",
+                "bonus_hp": "0"
+            },
+            {
+                "id": "16",
+                "name": "Silver Sword",
+                "photo": "image\\genshin\\weapon\\Silver_Sword.png",
+                "rarity": "2",
+                "dmg": "25",
+                "bonus_dmg": "0",
+                "bonus_rate": "0",
+                "bonus_hp": "0"
+            },
+            {
+                "id": "17",
+                "name": "Dull Blade",
+                "photo": "image\\genshin\\weapon\\Dull_Blade.png",
+                "rarity": "1",
+                "dmg": "10",
+                "bonus_dmg": "0",
+                "bonus_rate": "0",
+                "bonus_hp": "0"
+            }
+        ];
+
+        const enemiess = [{
+                "id": "1",
+                "name": "Pyro Slime",
+                "photo": "image\\genshin\\enemy\\slimes\\Pyro_Slime.png",
+                "type": "Slimes",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "2",
+                "name": "Cryo Slime",
+                "photo": "image\\genshin\\enemy\\slimes\\Cryo_Slime.png",
+                "type": "Slimes",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "3",
+                "name": "Hydro Slime",
+                "photo": "image\\genshin\\enemy\\slimes\\Hydro_Slime.png",
+                "type": "Slimes",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "4",
+                "name": "Electro Slime",
+                "photo": "image\\genshin\\enemy\\slimes\\Electro_Slime.png",
+                "type": "Slimes",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "5",
+                "name": "Geo Slime",
+                "photo": "image\\genshin\\enemy\\slimes\\Geo_Slime.png",
+                "type": "Slimes",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "6",
+                "name": "Dendro Slime",
+                "photo": "image\\genshin\\enemy\\slimes\\Dendro_Slime.png",
+                "type": "Slimes",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "7",
+                "name": "Anemo Slime",
+                "photo": "image\\genshin\\enemy\\slimes\\Anemo_Slime.png",
+                "type": "Slimes",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "8",
+                "name": "Mutant Electro Slime",
+                "photo": "image\\genshin\\enemy\\slimes\\Mutant_Electro_Slime.png",
+                "type": "Slimes",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "9",
+                "name": "Pyro Hilichurl",
+                "photo": "image\\genshin\\enemy\\hilichurls\\Pyro_Hilichurl.png",
+                "type": "Hilichurls",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "10",
+                "name": "Cryo Hilichurl",
+                "photo": "image\\genshin\\enemy\\hilichurls\\Cryo_Hilichurl.png",
+                "type": "Hilichurls",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "11",
+                "name": "Wooden Hilichurl",
+                "photo": "image\\genshin\\enemy\\hilichurls\\Wooden_Hilichurl.png",
+                "type": "Hilichurls",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "12",
+                "name": "Electro Hilichurl",
+                "photo": "image\\genshin\\enemy\\hilichurls\\Electro_Hilichurl.png",
+                "type": "Hilichurls",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "13",
+                "name": "Cryo Samachurl",
+                "photo": "image\\genshin\\enemy\\hilichurls\\Cryo_Samachurl.png",
+                "type": "Hilichurls",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "14",
+                "name": "Geo Samachurl",
+                "photo": "image\\genshin\\enemy\\hilichurls\\Geo_Samachurl.png",
+                "type": "Hilichurls",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "15",
+                "name": "Hydro Samachurl",
+                "photo": "image\\genshin\\enemy\\hilichurls\\Hydro_Samachurl.png",
+                "type": "Hilichurls",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "16",
+                "name": "Dendro Samachurl",
+                "photo": "image\\genshin\\enemy\\hilichurls\\Dendro_Samachurl.png",
+                "type": "Hilichurls",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "17",
+                "name": "Anemo Samachurl",
+                "photo": "image\\genshin\\enemy\\hilichurls\\Anemo_Samachurl.png",
+                "type": "Hilichurls",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "18",
+                "name": "Electro Samachurl",
+                "photo": "image\\genshin\\enemy\\hilichurls\\Electro_Samachurl.png",
+                "type": "Hilichurls",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "19",
+                "name": "Unusual Hilichurl",
+                "photo": "image\\genshin\\enemy\\hilichurls\\Unusual_Hilichurl.png",
+                "type": "Hilichurls",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "20",
+                "name": "Frostarm Lawachurl",
+                "photo": "image\\genshin\\enemy\\hilichurls\\Frostarm_Lawachurl.png",
+                "type": "Hilichurls",
+                "level": "Medium",
+                "exp": "50",
+                "health": "75",
+                "dmg": "50"
+            },
+            {
+                "id": "21",
+                "name": "Stonehide Lawachurl",
+                "photo": "image\\genshin\\enemy\\hilichurls\\Stonehide_Lawachurl.png",
+                "type": "Hilichurls",
+                "level": "Medium",
+                "exp": "50",
+                "health": "75",
+                "dmg": "50"
+            },
+            {
+                "id": "22",
+                "name": "Thunderhelm Lawachurl",
+                "photo": "image\\genshin\\enemy\\hilichurls\\Thunderhelm_Lawachurl.png",
+                "type": "Hilichurls",
+                "level": "Medium",
+                "exp": "50",
+                "health": "75",
+                "dmg": "50"
+            },
+            {
+                "id": "23",
+                "name": "Axe Mitachurl",
+                "photo": "image\\genshin\\enemy\\hilichurls\\Axe_Mitachurl.png",
+                "type": "Hilichurls",
+                "level": "Medium",
+                "exp": "50",
+                "health": "75",
+                "dmg": "50"
+            },
+            {
+                "id": "24",
+                "name": "Pyro Abyss Mage",
+                "photo": "image\\genshin\\enemy\\abyss\\Pyro_Abyss_Mage.png",
+                "type": "The Abyss",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "25",
+                "name": "Cryo Abyss Mage",
+                "photo": "image\\genshin\\enemy\\abyss\\Cryo_Abyss_Mage.png",
+                "type": "The Abyss",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "26",
+                "name": "Hydro Abyss Mage",
+                "photo": "image\\genshin\\enemy\\abyss\\Hydro_Abyss_Mage.png",
+                "type": "The Abyss",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "27",
+                "name": "Electro Abyss Mage",
+                "photo": "image\\genshin\\enemy\\abyss\\Electro_Abyss_Mage.png",
+                "type": "The Abyss",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "28",
+                "name": "Abyss Herald Wicked Torrents",
+                "photo": "image\\genshin\\enemy\\abyss\\Abyss_Herald_Wicked_Torrents.png",
+                "type": "The Abyss",
+                "level": "Medium",
+                "exp": "50",
+                "health": "75",
+                "dmg": "50"
+            },
+            {
+                "id": "29",
+                "name": "Abyss Lector Violet Lightning",
+                "photo": "image\\genshin\\enemy\\abyss\\Abyss_Lector_Violet_Lightning.png",
+                "type": "The Abyss",
+                "level": "Medium",
+                "exp": "50",
+                "health": "75",
+                "dmg": "50"
+            },
+            {
+                "id": "30",
+                "name": "Abyss Lector Fathomless Flames",
+                "photo": "image\\genshin\\enemy\\abyss\\Abyss_Lector_Fathomless_Flames.png",
+                "type": "The Abyss",
+                "level": "Medium",
+                "exp": "50",
+                "health": "75",
+                "dmg": "50"
+            },
+            {
+                "id": "31",
+                "name": "Rockfond Rifthound Whelp",
+                "photo": "image\\genshin\\enemy\\rifthounds\\Rockfond_Rifthound_Whelp.png",
+                "type": "Rifthounds",
+                "level": "Medium",
+                "exp": "50",
+                "health": "75",
+                "dmg": "50"
+            },
+            {
+                "id": "32",
+                "name": "Rockfond Rifthound",
+                "photo": "image\\genshin\\enemy\\rifthounds\\Rockfond_Rifthound.png",
+                "type": "Rifthounds",
+                "level": "Medium",
+                "exp": "50",
+                "health": "75",
+                "dmg": "50"
+            },
+            {
+                "id": "33",
+                "name": "Thundercraven Rifthound Whelp",
+                "photo": "image\\genshin\\enemy\\rifthounds\\Thundercraven_Rifthound_Whelp.png",
+                "type": "Rifthounds",
+                "level": "Medium",
+                "exp": "50",
+                "health": "75",
+                "dmg": "50"
+            },
+            {
+                "id": "34",
+                "name": "Thundercraven Rifthound",
+                "photo": "image\\genshin\\enemy\\rifthounds\\Thundercraven_Rifthound.png",
+                "type": "Rifthounds",
+                "level": "Medium",
+                "exp": "50",
+                "health": "75",
+                "dmg": "50"
+            },
+            {
+                "id": "35",
+                "name": "Standard Bearer",
+                "photo": "image\\genshin\\enemy\\shadowy_husks\\Standard_Bearer.png",
+                "type": "Shadowy Husks",
+                "level": "Medium",
+                "exp": "50",
+                "health": "75",
+                "dmg": "50"
+            },
+            {
+                "id": "36",
+                "name": "Line Breaker",
+                "photo": "image\\genshin\\enemy\\shadowy_husks\\Line_Breaker.png",
+                "type": "Shadowy Husks",
+                "level": "Medium",
+                "exp": "50",
+                "health": "75",
+                "dmg": "50"
+            },
+            {
+                "id": "37",
+                "name": "Defender",
+                "photo": "image\\genshin\\enemy\\shadowy_husks\\Defender.png",
+                "type": "Shadowy Husks",
+                "level": "Medium",
+                "exp": "50",
+                "health": "75",
+                "dmg": "50"
+            },
+            {
+                "id": "38",
+                "name": "Pyro Potioneer",
+                "photo": "image\\genshin\\enemy\\treasure_hoarders\\Pyro_Potioneer.png",
+                "type": "Treasure Hoarders",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "39",
+                "name": "Seaman",
+                "photo": "image\\genshin\\enemy\\treasure_hoarders\\Seaman.png",
+                "type": "Treasure Hoarders",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "40",
+                "name": "Handyman",
+                "photo": "image\\genshin\\enemy\\treasure_hoarders\\Handyman.png",
+                "type": "Treasure Hoarders",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "41",
+                "name": "Hydro Potioneer",
+                "photo": "image\\genshin\\enemy\\treasure_hoarders\\Hydro_Potioneer.png",
+                "type": "Treasure Hoarders",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "42",
+                "name": "Scout",
+                "photo": "image\\genshin\\enemy\\treasure_hoarders\\Scout.png",
+                "type": "Treasure Hoarders",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "43",
+                "name": "Marksman",
+                "photo": "image\\genshin\\enemy\\treasure_hoarders\\Marksman.png",
+                "type": "Treasure Hoarders",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "44",
+                "name": "Gravedigger",
+                "photo": "image\\genshin\\enemy\\treasure_hoarders\\Gravedigger.png",
+                "type": "Treasure Hoarders",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "45",
+                "name": "Cryo Potioneer",
+                "photo": "image\\genshin\\enemy\\treasure_hoarders\\Cryo_Potioneer.png",
+                "type": "Treasure Hoarders",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "46",
+                "name": "Crusher",
+                "photo": "image\\genshin\\enemy\\treasure_hoarders\\Crusher.png",
+                "type": "Treasure Hoarders",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "47",
+                "name": "Electro Potioneer",
+                "photo": "image\\genshin\\enemy\\treasure_hoarders\\Electro_Potioneer.png",
+                "type": "Treasure Hoarders",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "48",
+                "name": "Dancing Thunder",
+                "photo": "image\\genshin\\enemy\\nobushi\\Dancing_Thunder.png",
+                "type": "Nobushi",
+                "level": "Medium",
+                "exp": "50",
+                "health": "75",
+                "dmg": "50"
+            },
+            {
+                "id": "49",
+                "name": "Kikouban",
+                "photo": "image\\genshin\\enemy\\nobushi\\Kikouban.png",
+                "type": "Nobushi",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "50",
+                "name": "Hitsukeban",
+                "photo": "image\\genshin\\enemy\\nobushi\\Hitsukeban.png",
+                "type": "Nobushi",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "51",
+                "name": "Fiery Might",
+                "photo": "image\\genshin\\enemy\\nobushi\\Fiery_Might.png",
+                "type": "Nobushi",
+                "level": "Medium",
+                "exp": "50",
+                "health": "75",
+                "dmg": "50"
+            },
+            {
+                "id": "52",
+                "name": "Jintouban",
+                "photo": "image\\genshin\\enemy\\nobushi\\Jintouban.png",
+                "type": "Nobushi",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "53",
+                "name": "Pyro Agent",
+                "photo": "image\\genshin\\enemy\\fatui\\Pyro_Agent.png",
+                "type": "Fatui",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "54",
+                "name": "Cryo Gunner Legionnaire",
+                "photo": "image\\genshin\\enemy\\fatui\\Cryo_Gunner_Legionnaire.png",
+                "type": "Fatui",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "55",
+                "name": "Hydro Gunner Legionnaire",
+                "photo": "image\\genshin\\enemy\\fatui\\Hydro_Gunner_Legionnaire.png",
+                "type": "Fatui",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "56",
+                "name": "Electro Hammer Vanguard",
+                "photo": "image\\genshin\\enemy\\fatui\\Electro_Hammer_Vanguard.png",
+                "type": "Fatui",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "57",
+                "name": "Cryo Cicin Mage",
+                "photo": "image\\genshin\\enemy\\fatui\\Cryo_Cicin_Mage.png",
+                "type": "Fatui",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "58",
+                "name": "Pyro Slinger Bracer",
+                "photo": "image\\genshin\\enemy\\fatui\\Pyro_Slinger_Bracer.png",
+                "type": "Fatui",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "59",
+                "name": "Anemoboxer Vanguard",
+                "photo": "image\\genshin\\enemy\\fatui\\Anemoboxer_Vanguard.png",
+                "type": "Fatui",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "60",
+                "name": "Electro Cicin Mage",
+                "photo": "image\\genshin\\enemy\\fatui\\Electro_Cicin_Mage.png",
+                "type": "Fatui",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "61",
+                "name": "Geochanter Bracer",
+                "photo": "image\\genshin\\enemy\\fatui\\Geochanter_Bracer.png",
+                "type": "Fatui",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "62",
+                "name": "Mirror Maiden",
+                "photo": "image\\genshin\\enemy\\fatui\\Mirror_Maiden.png",
+                "type": "Fatui",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "63",
+                "name": "Ruin Guard",
+                "photo": "image\\genshin\\enemy\\automatons\\Ruin_Guard.png",
+                "type": "Automatons",
+                "level": "Medium",
+                "exp": "50",
+                "health": "75",
+                "dmg": "50"
+            },
+            {
+                "id": "64",
+                "name": "Ruin Hunter",
+                "photo": "image\\genshin\\enemy\\automatons\\Ruin_Hunter.png",
+                "type": "Automatons",
+                "level": "Medium",
+                "exp": "50",
+                "health": "75",
+                "dmg": "50"
+            },
+            {
+                "id": "65",
+                "name": "Ruin Grader",
+                "photo": "image\\genshin\\enemy\\automatons\\Ruin_Grader.png",
+                "type": "Automatons",
+                "level": "Medium",
+                "exp": "50",
+                "health": "75",
+                "dmg": "50"
+            },
+            {
+                "id": "66",
+                "name": "Ruin Scout",
+                "photo": "image\\genshin\\enemy\\automatons\\Ruin_Scout.png",
+                "type": "Automatons",
+                "level": "Medium",
+                "exp": "50",
+                "health": "75",
+                "dmg": "50"
+            },
+            {
+                "id": "67",
+                "name": "Ruin Defender",
+                "photo": "image\\genshin\\enemy\\automatons\\Ruin_Defender.png",
+                "type": "Automatons",
+                "level": "Medium",
+                "exp": "50",
+                "health": "75",
+                "dmg": "50"
+            },
+            {
+                "id": "68",
+                "name": "Ruin Destroyer",
+                "photo": "image\\genshin\\enemy\\automatons\\Ruin_Destroyer.png",
+                "type": "Automatons",
+                "level": "Medium",
+                "exp": "50",
+                "health": "75",
+                "dmg": "50"
+            },
+            {
+                "id": "69",
+                "name": "Geovishap Hatchling",
+                "photo": "image\\genshin\\enemy\\vishaps\\Geovishap_Hatchling.png",
+                "type": "Vishaps",
+                "level": "Medium",
+                "exp": "50",
+                "health": "75",
+                "dmg": "50"
+            },
+            {
+                "id": "70",
+                "name": "Bolteater Bathysmal Vishap",
+                "photo": "image\\genshin\\enemy\\vishaps\\Bolteater_Bathysmal_Vishap.png",
+                "type": "Vishaps",
+                "level": "Medium",
+                "exp": "50",
+                "health": "75",
+                "dmg": "50"
+            },
+            {
+                "id": "71",
+                "name": "Rimebiter Bathysmal Vishap",
+                "photo": "image\\genshin\\enemy\\vishaps\\Rimebiter_Bathysmal_Vishap.png",
+                "type": "Vishaps",
+                "level": "Medium",
+                "exp": "50",
+                "health": "75",
+                "dmg": "50"
+            },
+            {
+                "id": "72",
+                "name": "Primordial Bathysmal Vishap",
+                "photo": "image\\genshin\\enemy\\vishaps\\Primordial_Bathysmal_Vishap.png",
+                "type": "Vishaps",
+                "level": "Medium",
+                "exp": "50",
+                "health": "75",
+                "dmg": "50"
+            },
+            {
+                "id": "73",
+                "name": "Cryo Whopperflower",
+                "photo": "image\\genshin\\enemy\\whopperflowers\\Cryo_Whopperflower.png",
+                "type": "Whopperflowers",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "74",
+                "name": "Pyro Whopperflower",
+                "photo": "image\\genshin\\enemy\\whopperflowers\\Pyro_Whopperflower.png",
+                "type": "Whopperflowers",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "75",
+                "name": "Electro Whopperflower",
+                "photo": "image\\genshin\\enemy\\whopperflowers\\Electro_Whopperflower.png",
+                "type": "Whopperflowers",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "76",
+                "name": "Hydro Specter",
+                "photo": "image\\genshin\\enemy\\specter\\Hydro_Specter.png",
+                "type": "Specters",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "77",
+                "name": "Geo Specter",
+                "photo": "image\\genshin\\enemy\\specter\\Geo_Specter.png",
+                "type": "Specters",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "78",
+                "name": "Anemo Specter",
+                "photo": "image\\genshin\\enemy\\specter\\Anemo_Specter.png",
+                "type": "Specters",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "79",
+                "name": "Pyro Specter",
+                "photo": "image\\genshin\\enemy\\specter\\Pyro_Specter.png",
+                "type": "Specters",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "80",
+                "name": "Cryo Specter",
+                "photo": "image\\genshin\\enemy\\specter\\Cryo_Specter.png",
+                "type": "Specters",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "81",
+                "name": "Electro Specter",
+                "photo": "image\\genshin\\enemy\\specter\\Electro_Specter.png",
+                "type": "Specters",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "82",
+                "name": "Cryo Cicin",
+                "photo": "image\\genshin\\enemy\\cicins\\Cryo_Cicin.png",
+                "type": "Cicins",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "83",
+                "name": "Hydro Cicin",
+                "photo": "image\\genshin\\enemy\\cicins\\Hydro_Cicin.png",
+                "type": "Cicins",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "84",
+                "name": "Electro Cicin",
+                "photo": "image\\genshin\\enemy\\cicins\\Electro_Cicin.png",
+                "type": "Cicins",
+                "level": "Easy",
+                "exp": "25",
+                "health": "50",
+                "dmg": "25"
+            },
+            {
+                "id": "85",
+                "name": "Stormterror Dvalin",
+                "photo": "image\\genshin\\enemy\\boss\\Stormterror_Dvalin.png",
+                "type": "Boss",
+                "level": "Hard",
+                "exp": "100",
+                "health": "100",
+                "dmg": "80"
+            },
+            {
+                "id": "86",
+                "name": "Lupus Boreas",
+                "photo": "image\\genshin\\enemy\\boss\\Lupus_Boreas.png",
+                "type": "Boss",
+                "level": "Hard",
+                "exp": "100",
+                "health": "100",
+                "dmg": "80"
+            },
+            {
+                "id": "87",
+                "name": "Childe",
+                "photo": "image\\genshin\\enemy\\boss\\Childe.png",
+                "type": "Boss",
+                "level": "Hard",
+                "exp": "100",
+                "health": "100",
+                "dmg": "80"
+            },
+            {
+                "id": "88",
+                "name": "Azhdaha",
+                "photo": "image\\genshin\\enemy\\boss\\Azhdaha.png",
+                "type": "Boss",
+                "level": "Hard",
+                "exp": "100",
+                "health": "100",
+                "dmg": "80"
+            },
+            {
+                "id": "89",
+                "name": "La Signora",
+                "photo": "image\\genshin\\enemy\\boss\\La_Signora.png",
+                "type": "Boss",
+                "level": "Hard",
+                "exp": "100",
+                "health": "100",
+                "dmg": "80"
+            },
+            {
+                "id": "90",
+                "name": "Raiden Shogun",
+                "photo": "image\\genshin\\enemy\\boss\\Raiden_Shogun.png",
+                "type": "Boss",
+                "level": "Hard",
+                "exp": "100",
+                "health": "100",
+                "dmg": "80"
+            },
+            {
+                "id": "91",
+                "name": "Anemo Hypostasis",
+                "photo": "image\\genshin\\enemy\\boss\\Anemo_Hypostasis.png",
+                "type": "Boss",
+                "level": "Hard",
+                "exp": "100",
+                "health": "100",
+                "dmg": "80"
+            },
+            {
+                "id": "92",
+                "name": "Cryo Hypostasis",
+                "photo": "image\\genshin\\enemy\\boss\\Cryo_Hypostasis.png",
+                "type": "Boss",
+                "level": "Hard",
+                "exp": "100",
+                "health": "100",
+                "dmg": "80"
+            },
+            {
+                "id": "93",
+                "name": "Geo Hypostasis",
+                "photo": "image\\genshin\\enemy\\boss\\Geo_Hypostasis.png",
+                "type": "Boss",
+                "level": "Hard",
+                "exp": "100",
+                "health": "100",
+                "dmg": "80"
+            },
+            {
+                "id": "94",
+                "name": "Electro Hypostasis",
+                "photo": "image\\genshin\\enemy\\boss\\Electro_Hypostasis.png",
+                "type": "Boss",
+                "level": "Hard",
+                "exp": "100",
+                "health": "100",
+                "dmg": "80"
+            },
+            {
+                "id": "95",
+                "name": "Cryo Regisvine",
+                "photo": "image\\genshin\\enemy\\boss\\Cryo_Regisvine.png",
+                "type": "Boss",
+                "level": "Hard",
+                "exp": "100",
+                "health": "100",
+                "dmg": "80"
+            },
+            {
+                "id": "96",
+                "name": "Oceanid",
+                "photo": "image\\genshin\\enemy\\boss\\Oceanid.png",
+                "type": "Boss",
+                "level": "Hard",
+                "exp": "100",
+                "health": "100",
+                "dmg": "80"
+            },
+            {
+                "id": "97",
+                "name": "Hydro Hypostasis",
+                "photo": "image\\genshin\\enemy\\boss\\Hydro_Hypostasis.png",
+                "type": "Boss",
+                "level": "Hard",
+                "exp": "100",
+                "health": "100",
+                "dmg": "80"
+            },
+            {
+                "id": "98",
+                "name": "Pyro Hypostasis",
+                "photo": "image\\genshin\\enemy\\boss\\Pyro_Hypostasis.png",
+                "type": "Boss",
+                "level": "Hard",
+                "exp": "100",
+                "health": "100",
+                "dmg": "80"
+            },
+            {
+                "id": "99",
+                "name": "Bathysmal Vishap Herd",
+                "photo": "image\\genshin\\enemy\\boss\\Bathysmal_Vishap_Herd.png",
+                "type": "Boss",
+                "level": "Hard",
+                "exp": "100",
+                "health": "100",
+                "dmg": "80"
+            },
+            {
+                "id": "100",
+                "name": "Golden Wolflord",
+                "photo": "image\\genshin\\enemy\\boss\\Golden_Wolflord.png",
+                "type": "Boss",
+                "level": "Hard",
+                "exp": "100",
+                "health": "100",
+                "dmg": "80"
+            },
+            {
+                "id": "101",
+                "name": "Primo Geovishap",
+                "photo": "image\\genshin\\enemy\\boss\\Primo_Geovishap.png",
+                "type": "Boss",
+                "level": "Hard",
+                "exp": "100",
+                "health": "100",
+                "dmg": "80"
+            },
+            {
+                "id": "102",
+                "name": "Pyro Regisvine",
+                "photo": "image\\genshin\\enemy\\boss\\Pyro_Regisvine.png",
+                "type": "Boss",
+                "level": "Hard",
+                "exp": "100",
+                "health": "100",
+                "dmg": "80"
+            },
+            {
+                "id": "103",
+                "name": "Maguu Kenki",
+                "photo": "image\\genshin\\enemy\\boss\\Maguu_Kenki.png",
+                "type": "Boss",
+                "level": "Hard",
+                "exp": "100",
+                "health": "100",
+                "dmg": "80"
+            },
+            {
+                "id": "104",
+                "name": "Thunder Manifestation",
+                "photo": "image\\genshin\\enemy\\boss\\Thunder_Manifestation.png",
+                "type": "Boss",
+                "level": "Hard",
+                "exp": "100",
+                "health": "100",
+                "dmg": "80"
+            }
+        ];
+
+        //initialize firebase app
+        firebase.initializeApp({
+            projectId: 'apiwebservice-340215'
+        });
+
+        const ref = firebase.firestore().collection('myweapon');
+
+        Vue.use(Vuefire.firestorePlugin);
+
+
+        //TODO2
+        const db = firebase.firestore();
+        const refUsers = db.collection('users');
+        const refUserId = db.collection('userid');
+
+        const vm = new Vue({
+            el: '#app',
+            data: {
+
+                markers: [], //-> chest
+                easyMonsters: [],
+                win: false,
+                step: 0, //how many times the user press the button
+                radius: 50,
+                result: [],
+                found: [],
+                unique: [],
+                over: [],
+                uniquee: [],
+                easy: [],
+                medium: [],
+                boss: [],
+                enemies: [],
+                type: 'base',
+                mapType: 'roadmap',
+                map1: "2e4f894f39ed99c4",
+                map2: "16c6b5b16cb50df5",
+                map3: "2f89afe4cbcdecfd",
+                mapppp: "",
+                distance: 0,
+                easyName: "",
+                easyExp: 0,
+                easyHealth: 0,
+                easyDmg: 0,
+                mediumName: "",
+                mediumExp: 0,
+                mediumHealth: 0,
+                mediumDmg: 0,
+                bossName: "",
+                bossExp: 0,
+                bossHealth: 0,
+                bossDmg: 0,
+                enemies: enemiess,
+                img: "",
+                easynamee: "",
+                mediumnamee: "",
+                bossnamee: "",
+                easyNameArray: [],
+                images2: ['Pyro_Hilichurl', 'Anemo_Samachurl', 'Cryo_Hilichurl', 'Electro_Samachurl',
+                    'Wooden_Hilichurl', 'Unusual_Hilichurl', 'Electro_Hilichurl', 'Cryo_Samachurl',
+                    'Geo_Samachurl', 'Hydro_Samachurl', 'Dendro_Samachurl'
+                ],
+                images1: ['chest'],
+                images3: ['Frostarm_Lawachurl', 'Stonehide_Lawachurl', 'Thunderhelm_Lawachurl',
+                    'Axe_Mitachurl'
+                ],
+                images4: ['Anemo_Hypostasis', 'Maguu_Kenki', 'Stormterror_Dvalin'],
+                captureimg1: "",
+                captureimg2: "",
+                captureimg3: "",
+                //character stats and user stats
+                alive: true,
+                characterExp: 1,
+                characterLevel: 1,
+                username: "user",
+                characterHealth: 100,
+                nextLevel: 1000,
+                characterDamage: 50,
+                characterImg: "",
+                //weapon stats  
+                weapons: weaponsss, //all weapons from weapons array
+                weapon: 10, //weapon base dmg
+                weaponName: "",
+                totalDmg: 0,
+                weaponImg: "",
+                currentMonster: "",
+                findDuplicate: [],
+                dummy: [],
+                chestlabel: "",
+                collectedChests: [],
+                chestLocation: [],
+                chestLocationLat: 0,
+                chestLocationLng: 0,
+                defeatedEasyMonsters: [],
+                defeatedMediumMonsters: [],
+                defeatedHardMonsters: [],
+                weaponLooted: "",
+                weapons2: ["Silver Sword"],
+                weapons3: ["Cool Steel", "Dark Iron Sword", "Fillet Blade", "Harbinger of Dawn",
+                    "Skyrider Sword", "Traveler's Handy Sword"
+                ],
+                weapons4: ["Amenoma Kageuchi", "Blackcliff Longsword", "Sacrificial Sword", "The Alley Flash",
+                    "The Black Sword", "The Flute"
+                ],
+                weapons5: ["Aquila Favonia", "Haran Geppaku Futsu", "Skyward Blade"],
+                hit: false,
+                //TODO4
+                weaponObtained: [],
+                uniqueWeaponObtained: [],
+                users: [],
+                userid: [],
+                player: true,
+                userID: "",
+            },
+            ready: function () {
+                //TODO8
+                //checkPlayer();
+            },
+            watch: {
+                mapType() {
+                    switch (vm.mapType) {
+                        case 'roadmap':
+                            createMap(map.setMapTypeId(mapType));
+                            break;
+                        case 'satellite':
+                            map.setMapTypeId(vm.mapType);
+                            break;
+                        case 'hybrid':
+                            map.setMapTypeId(vm.mapType);
+                            break;
+                        case 'terrain':
+                            map.setMapTypeId(vm.mapType);
+                            break;
+                            //Problem 1: Cannot set custom map using setMapTypeId cannot set to mapID also so I just set to night mode/pokemon go mode
+
+                            // case 'night':
+                            //     //addMap("2e4f894f39ed99c4");
+                            //     //map.setMapTypeId("satellite");
+                            //     //vm.mapppp = "2e4f894f39ed99c4";
+                            //     //map.setMapTypeId(null);
+                            //     //vm.mapTypee = "2e4f894f39ed99c4";
+                            //     //map.setMapID(vm.mapTypee);
+                            //     //map.setMapId('2e4f894f39ed99c4');
+
+                            //     createMap("2e4f894f39ed99c4");
+                            //     break;
+                            // case 'hacker':
+                            //     map.setMapTypeId('16c6b5b16cb50df5');
+                            //     break;
+                            // case 'pokemon':
+                            //     map.setMapTypeId('2f89afe4cbcdecfd');
+                            //     break;
+                        default:
+                            map.setMapTypeId(vm.type);
+                            break;
+                    }
+
+                },
+                radius() {
+                    update();
+                },
+
+                type() {
+                    switch (vm.type) {
+                        case 'china':
+                            location = '_china.html';
+                            break;
+                        case 'africa':
+                            location = '_africa.html';
+                            break;
+                        case 'us':
+                            location = '_us.html';
+                            break;
+                        case 'brazil':
+                            location = '_brazil.html';
+                            break;
+                        case 'antarctica':
+                            location = '_antarctica.html';
+                            break;
+                        case 'uk':
+                            location = '_uk.html';
+                            break;
+                        case 'australia':
+                            location = '_australia.html';
+                            break;
+                        case 'hospital':
+                            location = '_hospital.html';
+                            break;
+                        default:
+                            location = '_game.html';
+                            break;
+                    }
+                }
+            },
+            methods: {
+                goToWorldMap() {
+                    location = "_worldmap.html";
+                },
+                locateChest(label) {
+                    // vm.chestlabel = label;
+                    // //based on the label we are going to locate the chest
+                    // for (let i = 0; i < vm.markers.length; i++) {
+                    //     if (vm.markers[i].label.text == label) {
+                    //         //set chest location
+                    //         vm.chestLocationLat = vm.markers[i].position.lat;
+                    //         vm.chestLocationLng = vm.markers[i].position.lng;
+                    //     }
+                    // }
+
+                    // vm.chestLocation.position = {
+                    //     lat: vm.chestLocationLat + 1,
+                    //     lng: vm.chestLocationLng
+                    // }
+
+                    // vm.playerPosition = vm.chestLocation
+                    // let c1 = map.getCenter();
+                    // if (bounds.contains(c1)) {
+                    //     map.setCenter(vm.chestLocation);
+                    //     player.setPosition(vm.chestLocation);
+                    // } else {
+                    //     map.setCenter(c1);
+                    // }
+
+                    //set chest as 
+                },
+                collectchest() {
+                    //console.log(vm.markers[0].label)
+                    var chestExp = 15;
+                    vm.characterExp = vm.characterExp + chestExp;
+
+                    if (vm.characterExp > vm.nextLevel) {
+                        //move to next level
+                        vm.characterLevel = vm.characterLevel + 1;
+
+                        switch (vm.characterLevel) {
+                            case 2:
+                                levelUp(2);
+                                break;
+                            case 3:
+                                levelUp(3);
+                                break;
+                            case 4:
+                                levelUp(4);
+                                break;
+                            case 5:
+                                levelUp(5);
+                                break;
+                            case 6:
+                                levelUp(6);
+                                break;
+                            case 7:
+                                levelUp(7);
+                                break;
+                            case 8:
+                                levelUp(8);
+                                break;
+                            case 9:
+                                levelUp(9);
+                                break;
+                            case 10:
+                                levelUp(10);
+                                break;
+                        }
+                    }
+                    var percentage = vm.characterExp / vm.nextLevel * 100;
+
+                    $('.progress').replaceWith(
+                        "<div class='progress' style='height:20px; width:" +
+                        percentage +
+                        "%; background-color: red;'></div>")
+                    console.log(vm.chestlabel)
+
+                    info.close();
+
+                    //hide marker
+                    for (let i = 0; i < vm.markers.length; i++) {
+                        if (vm.markers[i].label.text == vm.chestlabel) {
+                            //vm.markers.splice(i, 1);
+                            //setTimeout(() => {
+                            console.log(vm.markers[i].label.text)
+                            vm.markers[i].setVisible(false);
+                            console.log(vm.markers[i].setVisible(false))
+                            //after hide then delete
+                            vm.markers.splice(i, 1);
+                            //store collected chest ref to a new array for comparison later
+                            let m = vm.markers[i];
+                            vm.collectedChests.push(m);
+
+                            //}, 1000);
+                            //console.log(vm.collectedChests)
+                            break;
+                        }
+                    }
+
+                    // for (let m of vm.markers.filter(m => !m.found)) {
+                    //     m.found = true;
+                    // }
+
+                    //change to logic to if collected all 10 chest then only display msg
+                    //--------------------------------------------------------------------
+                    // if (vm.markers.every(m => m.found) && vm.win == false) {
+
+                    //     vm.win = true;
+                    //     setTimeout(() => {
+                    //         //set timeout will carryout a function to prevent from loading earlier than the marker dissapearing
+                    //         audio2.play();
+                    //         alert(`No more chests (${vm.step}) steps`);
+                    //         location = location;
+                    //     }, 1000);
+                    // }
+
+                    if (vm.collectedChests.length == 10) {
+                        //can only collect 1 time so if collect all will have 10 objects in array
+                        audio2.play();
+                        alert("Looted all chests. Come back later for more chests!")
+
+                    }
+
+                    //TODO5
+                    //update stats to database
+                    updateCharacterStats(vm.characterHealth, vm.characterExp, vm.characterDamage, vm
+                        .characterLevel);
+
+                },
+
+                fighteasy() {
+                    var end = false;
+
+                    do {
+                        //first round -> user strikes first
+                        vm.easyHealth = vm.easyHealth - vm.totalDmg;
+                        if (vm.easyHealth < 1) {
+
+                            //vm.characterHealth = playerHealth;
+                            vm.characterExp = vm.characterExp + vm.easyExp;
+                            if (vm.characterExp > vm.nextLevel) {
+                                //move to next level
+                                vm.characterLevel = vm.characterLevel + 1;
+
+                                switch (vm.characterLevel) {
+                                    case 2:
+                                        levelUp(2);
+                                        break;
+                                    case 3:
+                                        levelUp(3);
+                                        break;
+                                    case 4:
+                                        levelUp(4);
+                                        break;
+                                    case 5:
+                                        levelUp(5);
+                                        break;
+                                    case 6:
+                                        levelUp(6);
+                                        break;
+                                    case 7:
+                                        levelUp(7);
+                                        break;
+                                    case 8:
+                                        levelUp(8);
+                                        break;
+                                    case 9:
+                                        levelUp(9);
+                                        break;
+                                    case 10:
+                                        levelUp(10);
+                                        break;
+                                }
+                            }
+
+
+
+                            var percentage = vm.characterExp / vm.nextLevel * 100;
+
+                            $('.progress').replaceWith(
+                                "<div class='progress' style='height:20px; width:" +
+                                percentage +
+                                "%; background-color: red;'></div>")
+                            alert("player win!")
+
+                            //restore the monster health
+                            switch (vm.characterLevel) {
+                                case 1:
+                                    vm.easyHealth = 50;
+                                    break;
+                                case 2:
+                                    vm.easyHealth = 75;
+                                    break;
+                                case 3:
+                                    vm.easyHealth = 113;
+                                    break;
+                                case 4:
+                                    vm.easyHealth = 169;
+                                    break;
+                                case 5:
+                                    vm.easyHealth = 253;
+                                    break;
+                                case 6:
+                                    vm.easyHealth = 380;
+                                    break;
+                                case 7:
+                                    vm.easyHealth = 570;
+                                    break;
+                                case 8:
+                                    vm.easyHealth = 854;
+                                    break;
+                                case 9:
+                                    vm.easyHealth = 1281;
+                                    break;
+                                case 10:
+                                    vm.easyHealth = 1922;
+                                    break;
+                            }
+
+
+                            //weapon loot
+                            var enemyType = "easy";
+                            weaponLoot(enemyType);
+
+                            //hide marker
+                            for (let i = 0; i < vm.easy.length; i++) {
+                                if (vm.easy[i].label.text == vm.currentMonster) {
+                                    // setTimeout(() => {
+
+                                    // }, 1000);
+                                    vm.easy[i].setVisible(false);
+                                    vm.easy.splice(i, 1);
+
+                                    //store collected chest ref to a new array for comparison later
+                                    let m = vm.easy[i];
+                                    vm.defeatedEasyMonsters.push(m);
+                                }
+                            }
+                            end = true;
+                            break;
+                        }
+
+                        //second round -> monster fights back if alive
+                        vm.characterHealth = vm.characterHealth - vm.easyDmg;
+                        audio6.play();
+                        if (vm.characterHealth < 1) {
+                            end = true;
+                            vm.characterHealth = 0;
+                            audio7.play();
+                            alert("Player lose! Will respawn back to base!")
+                            location = '_hospital.html';
+                            break;
+                        }
+                    } while (end == false);
+
+
+                    infoEasy.close();
+
+                    if (vm.defeatedEasyMonsters.length == 11) {
+                        //can only collect 1 time so if collect all will have 10 objects in array
+                        audio2.play();
+                        alert("Looted all easy monsters. Come back later for more!")
+
+                    }
+
+                    //TODO5
+                    //update stats to database
+                    updateCharacterStats(vm.characterHealth, vm.characterExp, vm.characterDamage, vm
+                        .characterLevel);
+
+                },
+
+                fightmedium() {
+                    // var monsterDamage = 50;
+                    // var monsterHealth = 75;
+                    // var monsterExp = 50;
+
+
+                    // let playerDmg = vm.characterDamage;
+                    // let playerHealth = vm.characterHealth;
+
+                    var end = false;
+
+                    do {
+                        //first round -> user strikes first
+                        vm.mediumHealth = vm.mediumHealth - vm.totalDmg;
+                        if (vm.mediumHealth < 1) {
+
+
+                            vm.characterExp = vm.characterExp + vm.mediumExp;
+                            if (vm.characterExp > vm.nextLevel) {
+                                //move to next level
+                                vm.characterLevel = vm.characterLevel + 1;
+
+                                switch (vm.characterLevel) {
+                                    case 2:
+                                        levelUp(2);
+                                        break;
+                                    case 3:
+                                        levelUp(3);
+                                        break;
+                                    case 4:
+                                        levelUp(4);
+                                        break;
+                                    case 5:
+                                        levelUp(5);
+                                        break;
+                                    case 6:
+                                        levelUp(6);
+                                        break;
+                                    case 7:
+                                        levelUp(7);
+                                        break;
+                                    case 8:
+                                        levelUp(8);
+                                        break;
+                                    case 9:
+                                        levelUp(9);
+                                        break;
+                                    case 10:
+                                        levelUp(10);
+                                        break;
+                                }
+                            }
+                            var percentage = vm.characterExp / vm.nextLevel * 100;
+
+                            $('.progress').replaceWith(
+                                "<div class='progress' style='height:20px; width:" +
+                                percentage +
+                                "%; background-color: red;'></div>")
+                            alert("player win!")
+
+                            //restore the monster health
+                            switch (vm.characterLevel) {
+                                case 1:
+                                    vm.mediumHealth = 75;
+                                    break;
+                                case 2:
+                                    vm.mediumHealth = 113;
+                                    break;
+                                case 3:
+                                    vm.mediumHealth = 169;
+                                    break;
+                                case 4:
+                                    vm.mediumHealth = 253;
+                                    break;
+                                case 5:
+                                    vm.mediumHealth = 380;
+                                    break;
+                                case 6:
+                                    vm.mediumHealth = 570;
+                                    break;
+                                case 7:
+                                    vm.mediumHealth = 854;
+                                    break;
+                                case 8:
+                                    vm.mediumHealth = 1281;
+                                    break;
+                                case 9:
+                                    vm.mediumHealth = 1922;
+                                    break;
+                                case 10:
+                                    vm.mediumHealth = 2883;
+                                    break;
+                            }
+
+                            //weapon loot
+                            var enemyType = "medium";
+                            weaponLoot(enemyType);
+
+                            //hide marker
+                            for (let i = 0; i < vm.medium.length; i++) {
+                                if (vm.medium[i].label.text == vm.currentMonster) {
+                                    // console.log(vm.medium[i].label.text)
+                                    // console.log(vm.medium[i])
+                                    // setTimeout(() => {
+
+                                    // }, 1000);
+                                    vm.medium[i].setVisible(false);
+                                    vm.medium.splice(i, 1);
+                                    let m = vm.medium[i];
+                                    vm.defeatedMediumMonsters.push(m);
+                                }
+                            }
+                            end = true;
+                            break;
+                        }
+
+                        //second round -> monster fights back if alive
+                        vm.characterHealth = vm.characterHealth - vm.mediumDmg;
+                        audio6.play();
+                        if (vm.characterHealth < 1) {
+                            end = true;
+                            vm.characterHealth = 0;
+                            audio7.play();
+                            alert("Player lose! Will respawn back to base!")
+                            location = '_hospital.html';
+                            break;
+                        }
+                    } while (end == false);
+
+
+                    infoMedium.close();
+
+                    if (vm.defeatedMediumMonsters.length == 4) {
+                        //can only collect 1 time so if collect all will have 10 objects in array
+                        audio2.play();
+                        alert("Looted all medium monsters. Come back later for more!")
+
+                    }
+
+                    //TODO5
+                    //update stats to database
+                    updateCharacterStats(vm.characterHealth, vm.characterExp, vm.characterDamage, vm
+                        .characterLevel);
+
+                },
+
+                fightboss() {
+                    // var monsterDamage = 80;
+                    // var monsterHealth = 100;
+                    // var monsterExp = 100;
+
+
+                    // let playerDmg = vm.characterDamage;
+                    // let playerHealth = vm.characterHealth;
+
+                    var end = false;
+
+                    do {
+                        //first round -> user strikes first
+                        vm.bossHealth = vm.bossHealth - vm.totalDmg;
+                        if (vm.bossHealth < 1) {
+
+                            vm.characterExp = vm.characterExp + vm.bossExp;
+                            if (vm.characterExp > vm.nextLevel) {
+                                //move to next level
+                                vm.characterLevel = vm.characterLevel + 1;
+
+                                switch (vm.characterLevel) {
+                                    case 2:
+                                        levelUp(2);
+                                        break;
+                                    case 3:
+                                        levelUp(3);
+                                        break;
+                                    case 4:
+                                        levelUp(4);
+                                        break;
+                                    case 5:
+                                        levelUp(5);
+                                        break;
+                                    case 6:
+                                        levelUp(6);
+                                        break;
+                                    case 7:
+                                        levelUp(7);
+                                        break;
+                                    case 8:
+                                        levelUp(8);
+                                        break;
+                                    case 9:
+                                        levelUp(9);
+                                        break;
+                                    case 10:
+                                        levelUp(10);
+                                        break;
+                                }
+                            }
+                            var percentage = vm.characterExp / vm.nextLevel * 100;
+
+                            $('.progress').replaceWith(
+                                "<div class='progress' style='height:20px; width:" +
+                                percentage +
+                                "%; background-color: red;'></div>")
+                            alert("player win!")
+
+                            //restore the monster health
+                            switch (vm.characterLevel) {
+                                case 1:
+                                    vm.bossHealth = 100;
+                                    break;
+                                case 2:
+                                    vm.bossHealth = 175;
+                                    break;
+                                case 3:
+                                    vm.bossHealth = 306;
+                                    break;
+                                case 4:
+                                    vm.bossHealth = 536;
+                                    break;
+                                case 5:
+                                    vm.bossHealth = 938;
+                                    break;
+                                case 6:
+                                    vm.bossHealth = 1641;
+                                    break;
+                                case 7:
+                                    vm.bossHealth = 2872;
+                                    break;
+                                case 8:
+                                    vm.bossHealth = 5027;
+                                    break;
+                                case 9:
+                                    vm.bossHealth = 8796;
+                                    break;
+                                case 10:
+                                    vm.bossHealth = 15394;
+                                    break;
+                            }
+
+                            //weapon loot
+                            var enemyType = "boss";
+                            weaponLoot(enemyType);
+
+                            //hide marker
+                            for (let i = 0; i < vm.boss.length; i++) {
+                                if (vm.boss[i].label.text == vm.currentMonster) {
+                                    // console.log(vm.medium[i].label.text)
+                                    // console.log(vm.medium[i])
+                                    // setTimeout(() => {
+
+                                    // }, 1000);
+                                    vm.boss[i].setVisible(false);
+                                    vm.boss.splice(i, 1);
+                                    let m = vm.boss[i];
+                                    vm.defeatedHardMonsters.push(m);
+                                }
+                            }
+                            end = true;
+                            break;
+                        }
+
+                        //second round -> monster fights back if alive
+                        vm.characterHealth = vm.characterHealth - vm.bossDmg;
+                        audio6.play();
+                        if (vm.characterHealth < 1) {
+                            end = true;
+                            vm.characterHealth = 0;
+                            audio7.play();
+                            alert("Player lose! Will respawn back to base!")
+                            location = '_hospital.html';
+                            break;
+                        }
+                    } while (end == false);
+
+
+                    // setTimeout(() => {
+                    //     infoBoss.close();
+                    // }, 1000);
+                    infoBoss.close();
+
+
+                    if (vm.defeatedHardMonsters.length == 3) {
+                        //can only collect 1 time so if collect all will have 10 objects in array
+                        audio2.play();
+                        alert("Looted all boss monsters. Come back later for more!")
+
+                    }
+
+                    //TODO5
+                    //update stats to database
+                    updateCharacterStats(vm.characterHealth, vm.characterExp, vm.characterDamage, vm
+                        .characterLevel);
+                },
+
+                move(x, y) {
+
+                    //$("#panel").css("display", "none");
+
+                    let c1 = map.getCenter();
+                    //movement is faster if the multiplier is larger
+                    map.panBy(x * 10, y * 10);
+                    let c2 = map.getCenter();
+
+                    if (bounds.contains(c2)) {
+                        player.setPosition(c2);
+                    } else {
+                        map.setCenter(c1);
+                    }
+
+
+                    // -------------method for chest
+
+                    for (let m of vm.markers.filter(m => !m.found)) {
+                        let a = player.getPosition();
+                        let b = m.getPosition();
+                        m.distance = gm.geometry.spherical.computeDistanceBetween(a,
+                            b); //return distance in meters
+
+                        vm.distance = m.distance;
+
+
+                        //problem 2: wanted to only show monsters within 500m but it will show more than 500m after player move further away from target
+                        // if (m.distance < 500) {
+                        //     vm.found.push(m);
+                        //     $("#panel").css("display", "block");
+                        //     // let i = vm.markers.indexOf(m);
+                        //     // vm.markers.splice(i, 1);
+                        // }
+
+                        // if (m.distance > 500) {
+                        //     vm.over.push(m);
+                        //     $("#panel").css("display", "block");
+                        // }
+                        $("#panel").css("display", "block");
+                        if (m.distance < 20) {
+                            console.log(m.label.text)
+                            vm.chestlabel = m.label.text;
+                            //startTime = Date.now();
+                            audio1.play();
+                            m.addListener('click', e => {
+
+                                if (info.getMap()) {
+                                    //if not null means the windows is open
+                                    info.close();
+                                } else {
+                                    info.open(map, m);
+                                    // $("#collectChest").click(function () {
+                                    //     m.found = true;
+                                    //     info.close();
+                                    //     setTimeout(() => {
+                                    //         m.setVisible(false)
+                                    //     }, 1000);
+                                    // });
+                                    //alert("opened")
+                                    info.addListener('closeclick', () => {
+                                        info.close();
+                                    });
+                                }
+                            });
+                        }
+                    }
+
+
+                    //not used cannot use for (display if < 500m)
+                    // //remove duplicate
+                    // vm.found.forEach((c) => {
+                    //     if (!vm.unique.includes(c)) {
+                    //         vm.unique.push(c);
+                    //         //alert(vm.unique);
+                    //     }
+                    // });
+
+                    // vm.over.forEach((c) => {
+                    //     if (!vm.uniquee.includes(c)) {
+                    //         vm.uniquee.push(c);
+
+                    //     }
+                    // });
+                    // alert(vm.markers.every(m => m.found)) //why return false
+                    // if (vm.markers.every(m => m.found) && vm.win == false) {
+
+                    //     vm.win = true;
+                    //     setTimeout(() => {
+                    //         //set timeout will carryout a function to prevent from loading earlier than the marker dissapearing
+                    //         audio2.play();
+                    //         alert(`No more chests (${vm.step}) steps`);
+                    //         location = location;
+                    //     }, 1000);
+                    // }
+
+                    // easy = vm.enemies.find(obj => {
+                    //     return obj.type == "Hilichurls";
+                    // });
+
+
+                    // // -------------method for dummy monsters
+                    for (let j of vm.dummy.filter(j => !j.found)) {
+                        let a = player.getPosition();
+                        let b = j.getPosition();
+                        j.distance = gm.geometry.spherical.computeDistanceBetween(a, b);
+
+
+                        if (j.distance < 20) {
+
+                            vm.findDuplicate.push(j);
+                            //console.log(vm.findDuplicate[0].label.text)
+
+                            var name123 = j.label;
+                            vm.easyName = j.label;
+                            //vm.captureimg1 = vm.enemies.find(x => x.name == name123).photo;
+                            audio3.play();
+                            j.addListener('click', g => {
+
+                                vm.currentMonster = j.label;
+                                j.found = true;
+                                if (infoEasy.getMap()) {
+                                    infoEasy.close();
+                                } else {
+                                    infoEasy.setPosition(b);
+                                    infoEasy.open(map);
+                                    infoEasy.addListener('closeclick', () => {
+                                        infoEasy.close();
+                                    });
+                                }
+
+                            });
+                        }
+                    }
+
+                    // // -------------method for easy monsters
+                    for (let e of vm.easy.filter(e => !e.found)) {
+                        let a = player.getPosition();
+                        let b = e.getPosition();
+                        e.distance = gm.geometry.spherical.computeDistanceBetween(a, b);
+
+
+                        if (e.distance < 20) {
+
+                            vm.findDuplicate.push(e);
+                            //console.log(vm.findDuplicate[0].label.text)
+
+                            var name123 = e.label.text;
+                            vm.easyName = e.label.text;
+                            vm.captureimg1 = vm.enemies.find(x => x.name == name123).photo;
+                            audio3.play();
+                            e.addListener('click', g => {
+                                vm.currentMonster = e.label.text;
+                                console.log(vm.currentMonster)
+                                //e.found = true;
+                                if (infoEasy.getMap()) {
+                                    infoEasy.close();
+                                } else {
+                                    infoEasy.setPosition(b);
+                                    infoEasy.open(map);
+                                    infoEasy.addListener('closeclick', () => {
+                                        infoEasy.close();
+                                    });
+                                }
+
+                            });
+                        }
+                    }
+
+                    // if (vm.easy.every(e => e.found) && vm.win == false) {
+                    //     vm.win = true;
+                    //     setTimeout(() => {
+                    //         //set timeout will carryout a function to prevent from loading earlier than the marker dissapearing
+                    //         audio2.play();
+                    //         alert(`No more mosnters (${vm.step}) steps`);
+                    //         location = location;
+                    //     }, 1000);
+                    // }
+
+
+                    // -------------method for medium monsters
+                    for (let d of vm.medium.filter(d => !d.found)) {
+                        let a = player.getPosition();
+                        let b = d.getPosition();
+                        d.distance = gm.geometry.spherical.computeDistanceBetween(a, b);
+
+                        if (d.distance < 20) {
+                            vm.mediumName = d.label.text;
+                            //console.log(vm.mediumName)
+                            vm.captureimg2 = vm.enemies.find(x => x.name == d.label.text).photo;
+                            //console.log(resultt);
+                            //vm.mediumDmg = vm.enemies.find(x => x.name == d.label.text).dmg;
+                            //vm.mediumExp = vm.enemies.find(x => x.name == d.label.text).exp;
+                            //vm.mediumHealth = vm.enemies.find(x => x.name == d.label.text).health;
+                            // var imageeee = d.icon.url;
+                            // //console.log(resultt);
+                            // $("#image1").attr('src', imageeee);
+
+                            audio3.play();
+                            d.addListener('click', d => {
+                                //vm.currentMonster = d.label.text;
+                                vm.currentMonster = vm.mediumName;
+                                //console.log(vm.currentMonster)
+                                //d.found = true;
+                                if (infoMedium.getMap()) {
+                                    infoMedium.close();
+                                } else {
+                                    infoMedium.setPosition(b);
+                                    infoMedium.open(map);
+                                    // $("#fightMedium").click(function () {
+                                    //     //fight monsters
+                                    //     infoMedium.close();
+                                    //     setTimeout(() => {
+                                    //         d.setVisible(false)
+                                    //     }, 1000);
+                                    // });
+                                    infoMedium.addListener('closeclick', () => {
+                                        infoMedium.close();
+                                    });
+                                }
+                            });
+                        }
+                    }
+
+                    // -------------method for boss monsters
+                    for (let f of vm.boss.filter(f => !f.found)) {
+                        let a = player.getPosition();
+                        let b = f.getPosition();
+                        f.distance = gm.geometry.spherical.computeDistanceBetween(a, b);
+
+                        if (f.distance < 20) {
+                            vm.bossName = f.label.text;
+                            vm.captureimg3 = vm.enemies.find(x => x.name == f.label.text).photo;
+                            //console.log(resulttt);
+                            //vm.bossDmg = vm.enemies.find(x => x.name == f.label.text).dmg;
+                            //vm.bossExp = vm.enemies.find(x => x.name == f.label.text).exp;
+                            //vm.bossHealth = vm.enemies.find(x => x.name == f.label.text).health;
+                            // $("#image2").attr('src', resulttt);
+
+                            audio3.play();
+                            f.addListener('click', f => {
+                                vm.currentMonster = vm.bossName;
+                                //f.found = true;
+                                if (infoBoss.getMap()) {
+                                    infoBoss.close();
+                                } else {
+                                    infoBoss.setPosition(b);
+                                    infoBoss.open(map);
+                                    // $("#fightBoss").click(function () {
+                                    //     //fight monsters
+                                    //     infoBoss.close();
+                                    //     setTimeout(() => {
+                                    //         f.setVisible(false)
+                                    //     }, 1000);
+                                    // });
+                                    infoBoss.addListener('closeclick', () => {
+                                        infoBoss.close();
+                                    });
+                                }
+                            });
+                        }
+                    }
+
+
+
+                },
+
+                getLocation() {
+                    let options = {
+                        enableHighAccuracy: true, //default = false
+                        timeout: Infinity, //default = infinity, or you can provide the number (ms)
+                        maximumAge: 0 //default = 0, or you can provide the number (ms)
+                    };
+                    navigator.geolocation.getCurrentPosition(success, fail, options);
+                },
+            },
+            created() {
+                // fetch('enemies.json')
+                //     .then(resp => resp.json())
+                //     .then(json => this.enemies = json);
+
+                // fetch('weapons.json')
+                //     .then(resp => resp.json())
+                //     .then(json => this.weapons = json);
+
+                //TODO3
+                db.collection("users").get().then(snap => {
+                    snap.forEach(doc => {
+                        let f = {
+                            id: doc.id,
+                            ...doc.data()
+                        };
+                        this.users.push(f);
+                        //console.log(this.myweapon)
+                    });
+                });
+
+                db.collection("userid").get().then(snap => {
+                    snap.forEach(doc => {
+                        let f = {
+                            id: doc.id,
+                            ...doc.data()
+                        };
+                        this.userid.push(f);
+                        //console.log(this.myweapon)
+                    });
+                });
+
+                //window.addEventListener("load", checkPlayer());
+
+            },
+            mounted() {
+
+                //TODO8
+                //checkPlayer();
+
+                // TODO(3): Handle keydown event, call vm.move(x, y) accordingly
+                //          e.key or e.code = ArrowLeft, ArrowRight, ArrowUp, ArrowDown
+                $(document).keydown(e => {
+                    //console.log(e.key);
+                    if (vm.win) return;
+
+                    vm.step++;
+
+                    // switch (e.key) {
+                    //     case 'ArrowLeft':
+                    //         vm.move(-1, 0);
+                    //         break;
+                    //     case 'ArrowRight':
+                    //         vm.move(+1, 0);
+                    //         break;
+                    //     case 'ArrowUp':
+                    //         vm.move(0, -1);
+                    //         break;
+                    //     case 'ArrowDown':
+                    //         vm.move(0, +1);
+                    //         break;
+                    // }
+
+                    switch (e.keyCode) {
+                        case 65:
+                            vm.move(-1, 0);
+                            break;
+                        case 68:
+                            vm.move(+1, 0);
+                            break;
+                        case 87:
+                            vm.move(0, -1);
+                            break;
+                        case 83:
+                            vm.move(0, +1);
+                            break;
+                    }
+                });
+
+            }
+        });
+
+
+        // Google Maps --------------------------------------------------------
+        //delay loading of google maps
+        //setTimeout(() => {
+        const gm = google.maps;
+
+        const center = new gm.LatLng(3.214951, 101.728449);
+
+        const map = new gm.Map($('#map')[0], {
+            keyboardShortcuts: false, // EXTRA: Disable keyboard shortcuts
+            center,
+            zoom: 18,
+            //TODO8
+            disableDefaultUI: false,
+            mapTypeControl: false,
+            zoomControl: false,
+            clickableIcons: false,
+            gestureHandling: 'none',
+            mapId: vm.map1,
+            fullscreenControlOptions: {
+                position: google.maps.ControlPosition.BOTTOM_RIGHT,
+            },
+        });
+
+        //chest
+        const info = new gm.InfoWindow({
+            content: $('#info')[0]
+        });
+
+        //easy monsters
+        const infoEasy = new gm.InfoWindow({
+            content: $('#infoEasy')[0]
+        });
+
+        //medium monsters
+        const infoMedium = new gm.InfoWindow({
+            content: $('#infoMedium')[0]
+        });
+
+        //boss monsters
+        const infoBoss = new gm.InfoWindow({
+            content: $('#infoBoss')[0]
+        });
+
+        const mapPanel = $('#mapPanel')[0];
+        map.controls[gm.ControlPosition.LEFT_TOP].push(mapPanel);
+
+        const panel = $('#panel')[0];
+        //map.controls[gm.ControlPosition.TOP_LEFT].push(panel);
+        map.controls[gm.ControlPosition.LEFT_CENTER].push(panel);
+        //mapp.controls[gm.ControlPosition.LEFT_CENTER].push(panel);
+
+        const characterPanel = $('#characterPanel')[0];
+        map.controls[gm.ControlPosition.RIGHT_TOP].push(characterPanel);
+
+        const locationn = $('#location')[0];
+        //map.controls[gm.ControlPosition.TOP_LEFT].push(panel);
+        map.controls[gm.ControlPosition.TOP_CENTER].push(locationn);
+        //mapp.controls[gm.ControlPosition.TOP_CENTER].push(locationn);
+
+        const maptype = $('#mapType')[0];
+        //map.controls[gm.ControlPosition.TOP_LEFT].push(panel);
+        map.controls[gm.ControlPosition.BOTTOM_CENTER].push(maptype);
+        //mapp.controls[gm.ControlPosition.BOTTOM_CENTER].push(maptype);
+
+        //TODO9
+        //map.fullScreen[gm.ControlPosition.BOTTOM_RIGHT];
+
+        const player = new gm.Marker({
+            position: center,
+            map,
+            icon: {
+                url: 'image/traveler.gif',
+                scaledSize: new gm.Size(50, 30)
+            },
+            animation: gm.Animation.DROP
+        });
+
+        const sw = gm.geometry.spherical.computeOffset(center, 2000,
+            225); //from the center point I want to move to the sw for 2km/2000m, degree of sw is 225 degrees
+        const ne = gm.geometry.spherical.computeOffset(center, 2000, 45);
+        const bounds = new gm.LatLngBounds(sw, ne);
+        const rect = new gm.Rectangle({
+            map,
+            bounds,
+            strokeColor: 'red',
+            strokeWeight: 10,
+            fillOpacity: 0
+        });
+
+        //added----------------
+
+        // const circle = new gm.Circle({
+        //     map,
+        // });
+
+        // m.addListener('click', e => {
+        //     // TODO(4): Set origin, update result
+        //     origin = m;
+        //     update();
+        // });
+
+        //locations
+        const base = {
+            lat: 3.214951,
+            lng: 101.728449
+        };
+        const china = {
+            lat: 39.904155,
+            lng: 116.408317
+        };
+        const africa = {
+            lat: -33.92432500339443,
+            lng: 18.423829754450587
+        };
+        const us = {
+            lat: 38.898611159191596,
+            lng: -77.03665858310038
+        };
+        const brazil = {
+            lat: -15.797342612789414,
+            lng: -47.875679208847934
+        };
+        const antarctica = {
+            lat: -76.28940729134308,
+            lng: 22.966605132002734
+        };
+        const uk = {
+            lat: 51.501183028512244,
+            lng: -0.12475417578167868
+        };
+        const australia = {
+            lat: -33.869407451720015,
+            lng: 151.21290587413338
+        };
+        const hospital = {
+            lat: 44.07570262012044,
+            lng: -92.51686283110637
+        };
+
+        //----------------------
+
+        gm.event.addListenerOnce(map, 'bounds_changed', e => {
+            //once the map is loaded for the first time and the rectangle bounds is defined, we will drop the hearts on the map
+
+
+
+            totalDmg();
+            levelUp(vm.characterLevel);
+            let allImages = ['images1', 'images2', 'images3', 'images4'];
+            let location = ['base', 'china', 'africa', 'us', 'brazil', 'antarctica', 'uk',
+                'australia'
+            ];
+            let chestLabels = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
+            let locations = [
+                //3.215004, 101.728335
+                {
+                    lat: 3.215004,
+                    lng: 101.728335
+                },
+                {
+                    lat: 39.904155,
+                    lng: 116.408317
+                },
+                {
+                    lat: -33.92432500339443,
+                    lng: 18.423829754450587
+                },
+                {
+                    lat: 38.898611159191596,
+                    lng: -77.03665858310038
+                },
+                {
+                    lat: -15.797342612789414,
+                    lng: -47.875679208847934
+                },
+                {
+                    lat: -76.28940729134308,
+                    lng: 22.966605132002734
+                },
+                {
+                    lat: 51.501183028512244,
+                    lng: -0.12475417578167868
+                },
+                {
+                    lat: -33.869407451720015,
+                    lng: 151.21290587413338
+                },
+                {
+                    lat: 44.07570262012044,
+                    lng: -92.51686283110637
+                },
+            ];
+
+            //healing locations
+            // let healingLocations = [
+            //     //3.215004, 101.728335
+            //     {
+            //         lat: 3.215004,
+            //         lng: 101.738549
+            //     },
+            //     {
+            //         lat: 39.904155,
+            //         lng: 116.418317
+            //     },
+            //     {
+            //         lat: -33.92432500339443,
+            //         lng: 18.423829754450587
+            //     },
+            //     {
+            //         lat: 38.898611159191596,
+            //         lng: -77.03665858310038
+            //     },
+            //     {
+            //         lat: -15.797342612789414,
+            //         lng: -47.875679208847934
+            //     },
+            //     {
+            //         lat: -76.28940729134308,
+            //         lng: 22.966605132002734
+            //     },
+            //     {
+            //         lat: 51.501183028512244,
+            //         lng: -0.12475417578167868
+            //     },
+            //     {
+            //         lat: -33.869407451720015,
+            //         lng: 151.21290587413338
+            //     }
+            // ];
+
+            // //temp dummy location (2 pax)
+            // let dummyLocation1 = {
+            //     lat: 3.214997,
+            //     lng: 101.728666
+            // };
+            // dummyEnemyForTesting(dummyLocation1, "a");
+
+            // let dummyLocation2 = {
+            //     lat: 3.214577,
+            //     lng: 101.728658
+            // };
+            // dummyEnemyForTesting(dummyLocation2, "b");
+
+            let sp = bounds.toSpan();
+
+            //display chest
+            var number;
+            for (var p = 0; p < 10; p++) {
+                //number = 1;
+                var easynamee = chestLabels[p];
+                for (let img of vm.images1) {
+                    let p = {
+                        lat: sw.lat() + sp.lat() * Math.random(),
+                        lng: sw.lng() + sp.lng() * Math.random()
+                    };
+                    //var num = Math.floor(Math.random() * 10);
+
+
+                    var label = "chest";
+                    addMarker(p, img, label, easynamee);
+                }
+                //number++;
+            }
+
+
+            //display easy monsters
+            for (let img of vm.images2) {
+                let p = {
+                    lat: sw.lat() + sp.lat() * Math.random(),
+                    lng: sw.lng() + sp.lng() * Math.random()
+                };
+                easynamee = img.replaceAll('_', ' ');
+                vm.easyNameArray.push(easynamee);
+                var label = "easy";
+                addMarker(p, img, label, easynamee);
+            }
+
+            //display medium monsters
+            for (let img of vm.images3) {
+                let p = {
+                    lat: sw.lat() + sp.lat() * Math.random(),
+                    lng: sw.lng() + sp.lng() * Math.random()
+                };
+                mediumnamee = img.replaceAll('_', ' ');
+                var label = "medium";
+                addMarker(p, img, label, mediumnamee);
+            }
+
+            //display boss
+            for (let img of vm.images4) {
+                let p = {
+                    lat: sw.lat() + sp.lat() * Math.random(),
+                    lng: sw.lng() + sp.lng() * Math.random()
+                };
+                bossnamee = img.replaceAll('_', ' ');
+                var label = "boss";
+                addMarker(p, img, label, bossnamee);
+            }
+
+            vm.move(0, 0);
+
+            //add all portals into map
+            for (a = 0; a < locations.length; a++) {
+                addPortal(locations[a]);
+            }
+
+
+
+        });
+
+        function addMarker(position, image, type, label) {
+            let m = new gm.Marker({
+                map,
+                //mapp,
+                position,
+                //dunno why icon cannot come out
+                //solved: nest need to access url from html
+                //<img :src="m.icon.url">
+                label: {
+                    text: label,
+                    // setVisible: false,
+                    // visible: false,
+                    // fillOpacity: 0,
+                    fontSize: "0px",
+                },
+                icon: {
+                    url: `image/genshin/base/${image}.png`,
+                    scaledSize: new gm.Size(40, 40)
+                },
+                //icon: `image/h/${image}.png`,
+                distance: 0, // Custom property
+                found: false, // Custom property
+                color: image,
+
+            });
+
+
+            switch (type) {
+                case 'chest':
+                    vm.markers.push(m);
+                    break;
+                case 'easy':
+                    vm.easy.push(m);
+                    break;
+                case 'medium':
+                    vm.medium.push(m);
+                    break;
+                case 'boss':
+                    vm.boss.push(m);
+                    break;
+            }
+
+        }
+
+        //add portalMarker
+        function addPortal(location) {
+            let m = new gm.Marker({
+                map,
+                //mapp,
+                position: location,
+                //dunno why icon cannot come out
+                //solved: nest need to access url from html
+                //<img :src="m.icon.url">
+                icon: {
+                    //url: `image/h/${image}.png`,
+                    url: "image/genshin/waypoint.png",
+                    scaledSize: new gm.Size(40, 100)
+                },
+                //icon: `image/h/${image}.png`,
+                //distance: 0, // Custom property
+                //found: false, // Custom property
+                //color: image
+            });
+        }
+
+        //add healing site
+        // function addHealingSite(location) {
+        //     let m = new gm.Marker({
+        //         map,
+        //         //mapp,
+        //         position: location,
+        //         //dunno why icon cannot come out
+        //         //solved: nest need to access url from html
+        //         //<img :src="m.icon.url">
+        //         icon: {
+        //             //url: `image/h/${image}.png`,
+        //             url: "image/genshin/waypoint.png",
+        //             scaledSize: new gm.Size(40, 100)
+        //         },
+        //         //icon: `image/h/${image}.png`,
+        //         //distance: 0, // Custom property
+        //         //found: false, // Custom property
+        //         //color: image
+        //     });
+        // }
+
+        // function dummyEnemyForTesting(location, label) {
+        //     let m = new gm.Marker({
+        //         map,
+        //         label,
+        //         position: location,
+        //         icon: {
+        //             //url: `image/h/${image}.png`,
+        //             url: "image\\genshin\\enemy\\hilichurls\\Stonehide_Lawachurl.png",
+        //             scaledSize: new gm.Size(40, 40)
+        //         },
+        //     });
+
+        //     vm.dummy.push(m);
+        // }
+
+        //}, 1000);
+
+
+
+
+
+
+
+
+
+
+        function update() {
+
+            //circle.setCenter(player ? origin.position : null);
+            //circle.setCenter(player ? player.getPosition() : null);
+            circle.setCenter(player.getPosition());
+            circle.setRadius(vm.radius);
+            vm.result = [];
+            if (origin == null) {
+                return;
+            }
+
+            // //Update marker's distance and visibility
+            // for (let m of vm.markers.filter(m => !m.found)) {
+            //     let a = player.getPosition();
+            //     let b = m.getPosition();
+            //     m.distance = gm.geometry.spherical.computeDistanceBetween(a,
+            //         b); //return distance in meters
+
+            //     //TODO
+            //     // if (m.distance < 10) {
+            //     //     audio1.play();
+            //     //     m.found = true;
+            //     //     m.setVisible(false);
+            //     // }
+            //     if(m.distance <= vm.radius){
+            //         //m.setIcon(GREEN);
+            //         //vm.result.push({ label: m.label, distance});
+            //         vm.markers.push(m);
+            //     }
+            // }
+
+        }
+
+        function success(position) {
+            vm.lat = position.coords.latitude;
+            vm.lng = position.coords.longitude;
+            vm.acc = position.coords.accuracy;
+
+            let p = new gm.LatLng(vm.lat, vm.lng);
+            //marker.setPosition(p);
+            map.panTo(p);
+
+            //display markers
+            player.setPosition(p);
+        }
+
+        function fail(error) {
+            alert(`Error: (${error.code}) ${error.message}`);
+        }
+
+        function levelUp(level) {
+
+            switch (level) {
+
+                case 1:
+                    //character stats
+
+                    //get playerid docs from userid collection
+                    db.collection('userid').get().then((docs) => {
+                        docs.forEach(doc => {
+                            //console.log(doc.id)
+                            //use the id to search for user's stats
+                            db.collection('users').doc(doc.id).get().then(doc => {
+                                /* doc.id
+                                doc.data()
+                                doc.data().health */
+                                vm.characterHealth = doc.data().health;
+                                vm.characterDamage = doc.data().damage;
+                                vm.characterExp = doc.data().exp;
+                                vm.characterLevel = doc.data().level;
+                                vm.weaponName = doc.data().weapon;
+                                vm.weaponImg = doc.data().weaponimg;
+                                vm.characterImg = doc.data().photo;
+                                vm.weapon = doc.data().weapondmg;
+                            });
+                        })
+                    })
+
+                    // //get its own ID
+                    // db.collection('userid').doc("ALEX").get().then(doc => {
+                    //     /* doc.id
+                    //     doc.data()
+                    //     doc.data().health */
+                    //     //userIDDD = doc.id;
+
+                    // });
+
+                    totalDmg();
+                    updateProgressBar();
+                    //simple monster stats
+                    vm.easyHealth = 50;
+                    vm.easyDmg = 25;
+                    vm.easyExp = 25;
+                    //medium monster stats
+                    vm.mediumHealth = 75;
+                    vm.mediumDmg = 50;
+                    vm.mediumExp = 50;
+                    //boss monster stats
+                    vm.bossHealth = 100;
+                    vm.bossDmg = 80;
+                    vm.bossExp = 100;
+                    break;
+                case 2:
+                    alert("Player leveled up to Lvl 2!")
+                    //character stats
+
+
+                    //get playerid docs from userid collection
+                    db.collection('userid').get().then((docs) => {
+                        docs.forEach(doc => {
+                            //console.log(doc.id)
+                            //use the id to search for user's stats
+                            db.collection('users').doc(doc.id).get().then(doc => {
+                                /* doc.id
+                                doc.data()
+                                doc.data().health */
+                                vm.characterHealth = doc.data().health + 100;
+                                //vm.characterDamage = doc.data().damage;
+                                vm.characterExp = doc.data().exp;
+                                vm.characterLevel = doc.data().level;
+                                vm.weaponName = doc.data().weapon;
+                                vm.weaponImg = doc.data().weaponimg;
+                                vm.characterImg = doc.data().photo;
+                                vm.weapon = doc.data().weapondmg * 2;
+                            });
+                        })
+                    })
+
+                    //vm.characterHealth = 200; //default 200, demo 20000
+
+                    //not changable
+                    vm.nextLevel = vm.nextLevel * 1.5 + 1000;
+                    vm.characterDamage = vm.characterDamage * 1.75;
+
+                    //vm.weapon = vm.weapon * 2;//need  chng
+                    totalDmg();
+                    updateProgressBar();
+                    //simple monster stats
+                    vm.easyHealth = 50 * 1.5;
+                    vm.easyDmg = vm.easyDmg * 1.5 + vm.easyDmg;
+                    vm.easyExp = vm.easyExp * 2;
+                    //medium monster stats
+                    vm.mediumHealth = 75 * 1.5;
+                    vm.mediumDmg = vm.mediumDmg * 1.5 + vm.mediumDmg;
+                    vm.mediumExp = vm.mediumExp * 2;
+                    //boss monster stats
+                    vm.bossHealth = 100 * 1.75;
+                    vm.bossDmg = vm.bossDmg * 1.5 + vm.bossDmg;
+                    vm.bossExp = vm.bossExp * 2; //default 2, demo 200
+                    break;
+                case 3:
+                    alert("Player leveled up to Lvl 3!")
+                    //character stats
+
+                    //get playerid docs from userid collection
+                    db.collection('userid').get().then((docs) => {
+                        docs.forEach(doc => {
+                            //console.log(doc.id)
+                            //use the id to search for user's stats
+                            db.collection('users').doc(doc.id).get().then(doc => {
+                                /* doc.id
+                                doc.data()
+                                doc.data().health */
+                                vm.characterHealth = doc.data().health + 200;
+                                //vm.characterDamage = doc.data().damage;
+                                vm.characterExp = doc.data().exp;
+                                vm.characterLevel = doc.data().level;
+                                vm.weaponName = doc.data().weapon;
+                                vm.weaponImg = doc.data().weaponimg;
+                                vm.characterImg = doc.data().photo;
+                                vm.weapon = doc.data().weapondmg * 2;
+                            });
+                        })
+                    })
+
+                    //vm.characterHealth = 300;
+                    vm.nextLevel = vm.nextLevel * 1.5 + 1000;
+                    vm.characterDamage = vm.characterDamage * 1.75;
+                    //vm.weapon = vm.weapon * 2;
+                    totalDmg();
+                    updateProgressBar();
+                    //simple monster stats
+                    vm.easyHealth = 75 * 1.5;
+                    vm.easyDmg = vm.easyDmg * 1.5 + vm.easyDmg;
+                    vm.easyExp = vm.easyExp * 2;
+                    //medium monster stats
+                    vm.mediumHealth = 113 * 1.5;
+                    vm.mediumDmg = vm.mediumDmg * 1.5 + vm.mediumDmg;
+                    vm.mediumExp = vm.mediumExp * 2;
+                    //boss monster stats
+                    vm.bossHealth = 175 * 1.75;
+                    vm.bossDmg = vm.bossDmg * 1.5 + vm.bossDmg;
+                    vm.bossExp = vm.bossExp * 2;
+                    break;
+                case 4:
+                    alert("Player leveled up to Lvl 4!")
+                    //character stats
+
+                    //get playerid docs from userid collection
+                    db.collection('userid').get().then((docs) => {
+                        docs.forEach(doc => {
+                            //console.log(doc.id)
+                            //use the id to search for user's stats
+                            db.collection('users').doc(doc.id).get().then(doc => {
+                                /* doc.id
+                                doc.data()
+                                doc.data().health */
+                                vm.characterHealth = doc.data().health + 300;
+                                //vm.characterDamage = doc.data().damage;
+                                vm.characterExp = doc.data().exp;
+                                vm.characterLevel = doc.data().level;
+                                vm.weaponName = doc.data().weapon;
+                                vm.weaponImg = doc.data().weaponimg;
+                                vm.characterImg = doc.data().photo;
+                                vm.weapon = doc.data().weapondmg * 2;
+                            });
+                        })
+                    })
+
+                    //vm.characterHealth = 400;
+                    vm.nextLevel = vm.nextLevel * 1.5 + 1000;
+                    vm.characterDamage = vm.characterDamage * 1.75;
+                    //vm.weapon = vm.weapon * 2;
+                    totalDmg();
+                    updateProgressBar();
+                    //simple monster stats
+                    vm.easyHealth = 113 * 1.5;
+                    vm.easyDmg = vm.easyDmg * 1.5 + vm.easyDmg;
+                    vm.easyExp = vm.easyExp * 2;
+                    //medium monster stats
+                    vm.mediumHealth = 169 * 1.5;
+                    vm.mediumDmg = vm.mediumDmg * 1.5 + vm.mediumDmg;
+                    vm.mediumExp = vm.mediumExp * 2;
+                    //boss monster stats
+                    vm.bossHealth = 306 * 1.75;
+                    vm.bossDmg = vm.bossDmg * 1.5 + vm.bossDmg;
+                    vm.bossExp = vm.bossExp * 2;
+                    break;
+                case 5:
+                    alert("Player leveled up to Lvl 5!")
+                    //character stats
+                    //vm.characterHealth = 500;
+
+                    //get playerid docs from userid collection
+                    db.collection('userid').get().then((docs) => {
+                        docs.forEach(doc => {
+                            //console.log(doc.id)
+                            //use the id to search for user's stats
+                            db.collection('users').doc(doc.id).get().then(doc => {
+                                /* doc.id
+                                doc.data()
+                                doc.data().health */
+                                vm.characterHealth = doc.data().health + 400;
+                                //vm.characterDamage = doc.data().damage;
+                                vm.characterExp = doc.data().exp;
+                                vm.characterLevel = doc.data().level;
+                                vm.weaponName = doc.data().weapon;
+                                vm.weaponImg = doc.data().weaponimg;
+                                vm.characterImg = doc.data().photo;
+                                vm.weapon = doc.data().weapondmg * 2;
+                            });
+                        })
+                    })
+
+                    vm.nextLevel = vm.nextLevel * 1.5 + 1000;
+                    vm.characterDamage = vm.characterDamage * 1.75;
+                    //vm.weapon = vm.weapon * 2;
+                    totalDmg();
+                    updateProgressBar();
+                    //simple monster stats
+                    vm.easyHealth = 169 * 1.5;
+                    vm.easyDmg = vm.easyDmg * 1.5 + vm.easyDmg;
+                    vm.easyExp = vm.easyExp * 2;
+                    //medium monster stats
+                    vm.mediumHealth = 253 * 1.5;
+                    vm.mediumDmg = vm.mediumDmg * 1.5 + vm.mediumDmg;
+                    vm.mediumExp = vm.mediumExp * 2;
+                    //boss monster stats
+                    vm.bossHealth = 536 * 1.75;
+                    vm.bossDmg = vm.bossDmg * 1.5 + vm.bossDmg;
+                    vm.bossExp = vm.bossExp * 2;
+                    break;
+                case 6:
+                    alert("Player leveled up to Lvl 6!")
+                    //character stats
+
+                    //get playerid docs from userid collection
+                    db.collection('userid').get().then((docs) => {
+                        docs.forEach(doc => {
+                            //console.log(doc.id)
+                            //use the id to search for user's stats
+                            db.collection('users').doc(doc.id).get().then(doc => {
+                                /* doc.id
+                                doc.data()
+                                doc.data().health */
+                                vm.characterHealth = doc.data().health + 500;
+                                //vm.characterDamage = doc.data().damage;
+                                vm.characterExp = doc.data().exp;
+                                vm.characterLevel = doc.data().level;
+                                vm.weaponName = doc.data().weapon;
+                                vm.weaponImg = doc.data().weaponimg;
+                                vm.characterImg = doc.data().photo;
+                                vm.weapon = doc.data().weapondmg * 2;
+                            });
+                        })
+                    })
+
+                    //vm.characterHealth = 600;
+                    vm.nextLevel = vm.nextLevel * 1.5 + 1000;
+                    vm.characterDamage = vm.characterDamage * 1.75;
+                    //vm.weapon = vm.weapon * 2;
+                    totalDmg();
+                    updateProgressBar();
+                    //simple monster stats
+                    vm.easyHealth = 253 * 1.5;
+                    vm.easyDmg = vm.easyDmg * 1.5 + vm.easyDmg;
+                    vm.easyExp = 400;
+                    //medium monster stats
+                    vm.mediumHealth = 380 * 1.5;
+                    vm.mediumDmg = vm.mediumDmg * 1.5 + vm.mediumDmg;
+                    vm.mediumExp = 800;
+                    //boss monster stats
+                    vm.bossHealth = 938 * 1.75;
+                    vm.bossDmg = vm.bossDmg * 1.5 + vm.bossDmg;
+                    vm.bossExp = 1600;
+                    break;
+                case 7:
+                    alert("Player leveled up to Lvl 7!")
+                    //character stats
+
+                    //get playerid docs from userid collection
+                    db.collection('userid').get().then((docs) => {
+                        docs.forEach(doc => {
+                            //console.log(doc.id)
+                            //use the id to search for user's stats
+                            db.collection('users').doc(doc.id).get().then(doc => {
+                                /* doc.id
+                                doc.data()
+                                doc.data().health */
+                                vm.characterHealth = doc.data().health + 600;
+                                //vm.characterDamage = doc.data().damage;
+                                vm.characterExp = doc.data().exp;
+                                vm.characterLevel = doc.data().level;
+                                vm.weaponName = doc.data().weapon;
+                                vm.weaponImg = doc.data().weaponimg;
+                                vm.characterImg = doc.data().photo;
+                                vm.weapon = doc.data().weapondmg * 2;
+                            });
+                        })
+                    })
+
+                    //vm.characterHealth = 700;
+                    vm.nextLevel = vm.nextLevel * 2 + 1000;
+                    vm.characterDamage = vm.characterDamage * 1.75;
+                    //vm.weapon = vm.weapon * 2;
+                    totalDmg();
+                    updateProgressBar();
+                    //simple monster stats
+                    vm.easyHealth = 380 * 1.5;
+                    vm.easyDmg = vm.easyDmg * 1.5 + vm.easyDmg;
+                    vm.easyExp = 400;
+                    //medium monster stats
+                    vm.mediumHealth = 570 * 1.5;
+                    vm.mediumDmg = vm.mediumDmg * 1.5 + vm.mediumDmg;
+                    vm.mediumExp = 800;
+                    //boss monster stats
+                    vm.bossHealth = 1641 * 1.75;
+                    vm.bossDmg = vm.bossDmg * 1.5 + vm.bossDmg;
+                    vm.bossExp = 1600;
+                    break;
+                case 8:
+                    alert("Player leveled up to Lvl 8!")
+                    //character stats
+
+                    //get playerid docs from userid collection
+                    db.collection('userid').get().then((docs) => {
+                        docs.forEach(doc => {
+                            //console.log(doc.id)
+                            //use the id to search for user's stats
+                            db.collection('users').doc(doc.id).get().then(doc => {
+                                /* doc.id
+                                doc.data()
+                                doc.data().health */
+                                vm.characterHealth = doc.data().health + 700;
+                                //vm.characterDamage = doc.data().damage;
+                                vm.characterExp = doc.data().exp;
+                                vm.characterLevel = doc.data().level;
+                                vm.weaponName = doc.data().weapon;
+                                vm.weaponImg = doc.data().weaponimg;
+                                vm.characterImg = doc.data().photo;
+                                vm.weapon = doc.data().weapondmg * 2;
+                            });
+                        })
+                    })
+
+                    //vm.characterHealth = 800;
+                    vm.nextLevel = vm.nextLevel * 2 + 1000;
+                    vm.characterDamage = vm.characterDamage * 1.75;
+                    //vm.weapon = vm.weapon * 2;
+                    totalDmg();
+                    updateProgressBar();
+                    //simple monster stats
+                    vm.easyHealth = 570 * 1.5;
+                    vm.easyDmg = vm.easyDmg * 1.5 + vm.easyDmg;
+                    vm.easyExp = 400;
+                    //medium monster stats
+                    vm.mediumHealth = 854 * 1.5;
+                    vm.mediumDmg = vm.mediumDmg * 1.5 + vm.mediumDmg;
+                    vm.mediumExp = 800;
+                    //boss monster stats
+                    vm.bossHealth = 2872 * 1.75;
+                    vm.bossDmg = vm.bossDmg * 1.5 + vm.bossDmg;
+                    vm.bossExp = 1600;
+                    break;
+                case 9:
+                    alert("Player leveled up to Lvl 9!")
+                    //character stats
+
+                    //get playerid docs from userid collection
+                    db.collection('userid').get().then((docs) => {
+                        docs.forEach(doc => {
+                            //console.log(doc.id)
+                            //use the id to search for user's stats
+                            db.collection('users').doc(doc.id).get().then(doc => {
+                                /* doc.id
+                                doc.data()
+                                doc.data().health */
+                                vm.characterHealth = doc.data().health + 800;
+                                //vm.characterDamage = doc.data().damage;
+                                vm.characterExp = doc.data().exp;
+                                vm.characterLevel = doc.data().level;
+                                vm.weaponName = doc.data().weapon;
+                                vm.weaponImg = doc.data().weaponimg;
+                                vm.characterImg = doc.data().photo;
+                                vm.weapon = doc.data().weapondmg * 2;
+                            });
+                        })
+                    })
+
+                    //vm.characterHealth = 800;
+                    vm.nextLevel = vm.nextLevel * 2 + 1000;
+                    vm.characterDamage = vm.characterDamage * 1.75;
+                    //vm.weapon = vm.weapon * 2;
+                    totalDmg();
+                    updateProgressBar();
+                    //simple monster stats
+                    vm.easyHealth = 854 * 1.5;
+                    vm.easyDmg = vm.easyDmg * 1.5 + vm.easyDmg;
+                    vm.easyExp = 400;
+                    //medium monster stats
+                    vm.mediumHealth = 1281 * 1.5;
+                    vm.mediumDmg = vm.mediumDmg * 1.5 + vm.mediumDmg;
+                    vm.mediumExp = 800;
+                    //boss monster stats
+                    vm.bossHealth = 5027 * 1.75;
+                    vm.bossDmg = vm.bossDmg * 1.5 + vm.bossDmg;
+                    vm.bossExp = 1600;
+                    break;
+                case 10:
+                    alert("Player leveled up to Lvl 10!")
+                    //character stats
+
+                    //get playerid docs from userid collection
+                    db.collection('userid').get().then((docs) => {
+                        docs.forEach(doc => {
+                            //console.log(doc.id)
+                            //use the id to search for user's stats
+                            db.collection('users').doc(doc.id).get().then(doc => {
+                                /* doc.id
+                                doc.data()
+                                doc.data().health */
+                                vm.characterHealth = doc.data().health + 900;
+                                //vm.characterDamage = doc.data().damage;
+                                vm.characterExp = doc.data().exp;
+                                vm.characterLevel = doc.data().level;
+                                vm.weaponName = doc.data().weapon;
+                                vm.weaponImg = doc.data().weaponimg;
+                                vm.characterImg = doc.data().photo;
+                                vm.weapon = doc.data().weapondmg * 2;
+                            });
+                        })
+                    })
+
+                    //vm.characterHealth = 800;
+                    vm.nextLevel = 9999999999;
+                    vm.characterDamage = vm.characterDamage * 1.75;
+                    //vm.weapon = vm.weapon * 2;
+                    totalDmg();
+                    updateProgressBar();
+                    //simple monster stats
+                    vm.easyHealth = 1281 * 1.5;
+                    vm.easyDmg = vm.easyDmg * 1.5 + vm.easyDmg;
+                    vm.easyExp = 400;
+                    //medium monster stats
+                    vm.mediumHealth = 1922 * 1.5;
+                    vm.mediumDmg = vm.mediumDmg * 1.5 + vm.mediumDmg;
+                    vm.mediumExp = 800;
+                    //boss monster stats
+                    vm.bossHealth = 8796 * 1.75;
+                    vm.bossDmg = vm.bossDmg * 1.5 + vm.bossDmg;
+                    vm.bossExp = 1600;
+                    break;
+            }
+
+
+
+
+        }
+
+        function totalDmg() {
+            setTimeout(() => {
+                //d.setVisible(false)
+
+                //vm.weaponImg = vm.weapons.find(x => x.name == vm.weaponName).photo;
+                //console.log(vm.weapons.find(x => x.name == vm.weaponName).photo)
+                vm.totalDmg = vm.characterDamage + parseInt(vm.weapon);
+                //vm.totalDmg = cDmg + wDmg;
+                //havent add bonus dmg
+            }, 1000);
+
+        }
+
+        function updateProgressBar() {
+            setTimeout(() => {
+                var percentage = vm.characterExp / vm.nextLevel * 100;
+
+                $('.progress').replaceWith(
+                    "<div class='progress' style='height:20px; width:" +
+                    percentage +
+                    "%; background-color: red;'></div>")
+                console.log(vm.chestlabel)
+            }, 1000);
+        }
+
+        // function fightEasy(enemyName) {
+        //     console.log("why got run here one")
+        //     //if param is not the current monster exit function
+        //     if (vm.currentMonster != enemyName) {
+        //         return;
+        //     }
+
+        //     //base stats for easy monsters
+        //     var monsterDamage = 25;
+        //     var monsterHealth = 50;
+        //     var monsterExp = 25;
+
+        //     // alert(enemyName)
+        //     // var duplicate = [];
+        //     // duplicate.push(enemyName);
+        //     // if(duplicate.length > 1){
+        //     //     //break;
+        //     //     duplicate.shift();
+        //     //     return;
+        //     // }
+
+
+        //     //setTimeout(() => {
+        //     let playerDmg = vm.characterDamage;
+        //     let playerHealth = vm.characterHealth;
+
+        //     var end = false;
+
+        //     do {
+        //         //alert("round 1")
+        //         //first round -> user strikes first
+        //         monsterHealth = monsterHealth - playerDmg;
+        //         if (monsterHealth < 1) {
+
+        //             vm.characterHealth = playerHealth;
+        //             vm.characterExp = vm.characterExp + monsterExp;
+        //             if (vm.characterExp > vm.nextLevel) {
+        //                 //move to next level
+        //                 vm.characterLevel = vm.characterLevel + 1;
+
+        //                 switch (vm.characterLevel) {
+        //                     case '2':
+        //                         levelUp(2);
+        //                         break;
+        //                     case '3':
+        //                         levelUp(3);
+        //                         break;
+        //                     case '4':
+        //                         levelUp(4);
+        //                         break;
+        //                     case '5':
+        //                         levelUp(5);
+        //                         break;
+        //                     case '6':
+        //                         levelUp(6);
+        //                         break;
+        //                     case '7':
+        //                         levelUp(7);
+        //                         break;
+        //                     case '8':
+        //                         levelUp(8);
+        //                         break;
+        //                     case '9':
+        //                         levelUp(9);
+        //                         break;
+        //                     case '10':
+        //                         levelUp(10);
+        //                         break;
+        //                 }
+        //             }
+        //             var percentage = vm.characterExp / vm.nextLevel * 100;
+        //             //alert(percentage)
+        //             $('.progress').replaceWith("<div class='progress' style='height:20px; width:" + percentage +
+        //                 "%; background-color: red;'></div>")
+
+        //             alert("player win!")
+        //             end = true;
+        //             break;
+        //         }
+
+        //         //second round -> monster fights back if alive
+        //         playerHealth = playerHealth - monsterDamage;
+        //         if (playerHealth < 1) {
+        //             end = true;
+        //             vm.characterHealth = 0;
+        //             alert("player lose!")
+        //             break;
+        //         }
+        //     } while (end == win);
+        //     //}, 1000);
+        // }
+
+        // function fightMedium() {
+        //     //base stats for medium monsters
+        //     var monsterDamage = 50;
+        //     var monsterHealth = 75;
+        //     var monsterExp = 50;
+
+        //     setTimeout(() => {
+        //         let playerDmg = vm.characterDamage;
+        //         let playerHealth = vm.characterHealth;
+
+        //         var end = false;
+
+        //         do {
+        //             //first round -> user strikes first
+        //             monsterHealth = monsterHealth - playerDmg;
+        //             if (monsterHealth < 1) {
+        //                 end = true;
+        //                 vm.characterHealth = playerHealth;
+        //                 alert("player win!")
+        //                 return;
+        //             }
+
+        //             //second round -> monster fights back if alive
+        //             playerHealth = playerHealth - monsterDamage;
+        //             if (playerHealth < 1) {
+        //                 end = true;
+        //                 vm.characterHealth = 0;
+        //                 alert("player lose!")
+        //                 break;
+        //             }
+        //         } while (end == win);
+        //     }, 1000);
+        // }
+
+        // function fightBoss() {
+        //     //base stats for medium monsters
+        //     var monsterDamage = 80;
+        //     var monsterHealth = 100;
+        //     var monsterExp = 100;
+
+        //     setTimeout(() => {
+        //         let playerDmg = vm.characterDamage;
+        //         let playerHealth = vm.characterHealth;
+
+        //         var end = false;
+
+        //         do {
+        //             //first round -> user strikes first
+        //             monsterHealth = monsterHealth - playerDmg;
+        //             if (monsterHealth < 1) {
+        //                 end = true;
+        //                 vm.characterHealth = playerHealth;
+        //                 alert("player win!")
+        //                 return;
+        //             }
+
+        //             //second round -> monster fights back if alive
+        //             playerHealth = playerHealth - monsterDamage;
+        //             if (playerHealth < 1) {
+        //                 end = true;
+        //                 vm.characterHealth = 0;
+        //                 alert("player lose!")
+        //                 break;
+        //             }
+        //         } while (end == win);
+        //     }, 1000);
+        // }
+
+        function weaponLoot(type) {
+
+            var chance;
+            if (type == "easy") {
+                // 2 star weapons = 70% rate
+                // 3 star weapons = 50% rate
+                // 4 star weapons = 20% rate
+
+                //first try
+                if (vm.hit == false) {
+                    chance = Math.floor(Math.random() * 10);
+                    console.log(chance)
+                    if (chance <= 7) {
+                        // 50% chance of getting 2 star weapon
+                        var size = vm.weapons2.length;
+                        var i = Math.floor(Math.random() * size);
+                        vm.weaponLooted = vm.weapons2[i];
+                        console.log("weapon rewarded is " + vm.weaponLooted)
+                        vm.hit = true;
+                    }
+                }
+
+                //second try
+                if (vm.hit == false) {
+                    chance = Math.floor(Math.random() * 10);
+                    console.log(chance)
+                    if (chance <= 5) {
+                        // 25% chance of getting 3 star weapon
+                        var size = vm.weapons3.length;
+                        var i = Math.floor(Math.random() * size);
+                        vm.weaponLooted = vm.weapons3[i];
+                        console.log("weapon rewarded is " + vm.weaponLooted)
+                        vm.hit = true;
+                    }
+                }
+
+                //third try
+                if (vm.hit == false) {
+                    chance = Math.floor(Math.random() * 10);
+                    console.log(chance)
+                    if (chance <= 2) {
+                        // 10% chance of getting 4 star weapon
+                        var size = vm.weapons4.length;
+                        var i = Math.floor(Math.random() * size);
+                        vm.weaponLooted = vm.weapons4[i];
+                        console.log("weapon rewarded is " + vm.weaponLooted)
+                        vm.hit = true;
+                    }
+                }
+
+                // if chance does not hit then player does not receive any weapons
+                if (vm.hit == false) {
+                    vm.weaponLooted = "null";
+                }
+
+                //display weapon looted
+                if (vm.weaponLooted == "null") {
+                    alert("Aww, no weapon dropped 😥. Better luck next time!")
+                } else {
+
+                    alert("Congradulations! You have received a " + vm.weaponLooted)
+
+                    //TODO
+                    //insert weapon into database
+                    //get weapon object
+                    vm.weaponObtained.push(vm.weaponLooted);
+
+                    //find duplicated values
+                    vm.uniqueWeaponObtained = vm.weaponObtained.filter((c, index) => {
+                        return vm.weaponObtained.indexOf(c) !== index;
+                    });
+
+                    if (vm.uniqueWeaponObtained.length < 1) {
+                        let weaponObject = vm.weapons.find(x => x.name == vm.weaponLooted);
+                        ref.doc(vm.weaponLooted).set(weaponObject);
+                    }
+
+
+
+                }
+
+
+                vm.hit = false;
+            } else if (type == "medium") {
+
+                // 3 star weapons = 70% rate
+                // 4 star weapons = 50% rate
+                // 5 star weapons = 20% rate
+
+                //first try
+                if (vm.hit == false) {
+                    chance = Math.floor(Math.random() * 10);
+                    console.log(chance)
+                    if (chance <= 7) {
+                        // 50% chance of getting 3 star weapon
+                        var size = vm.weapons3.length;
+                        var i = Math.floor(Math.random() * size);
+                        vm.weaponLooted = vm.weapons3[i];
+                        console.log("weapon rewarded is " + vm.weaponLooted)
+                        vm.hit = true;
+                    }
+                }
+
+                //second try
+                if (vm.hit == false) {
+                    chance = Math.floor(Math.random() * 10);
+                    console.log(chance)
+                    if (chance <= 5) {
+                        // 25% chance of getting 4 star weapon
+                        var size = vm.weapons4.length;
+                        var i = Math.floor(Math.random() * size);
+                        vm.weaponLooted = vm.weapons4[i];
+                        console.log("weapon rewarded is " + vm.weaponLooted)
+                        vm.hit = true;
+                    }
+                }
+
+                //third try
+                if (vm.hit == false) {
+                    chance = Math.floor(Math.random() * 10);
+                    console.log(chance)
+                    if (chance <= 2) {
+                        // 10% chance of getting 5 star weapon
+                        var size = vm.weapons5.length;
+                        var i = Math.floor(Math.random() * size);
+                        vm.weaponLooted = vm.weapons5[i];
+                        console.log("weapon rewarded is " + vm.weaponLooted)
+                        vm.hit = true;
+                    }
+                }
+
+                // if chance does not hit then player does not receive any weapons
+                if (vm.hit == false) {
+                    vm.weaponLooted = "null";
+                }
+
+                //display weapon looted
+                if (vm.weaponLooted == "null") {
+                    alert("Aww, no weapon dropped 😥. Better luck next time!")
+                } else {
+
+                    alert("Congradulations! You have received a " + vm.weaponLooted)
+
+                    //TODO
+                    //insert weapon into database
+                    //get weapon object
+                    vm.weaponObtained.push(vm.weaponLooted);
+
+                    //find duplicated values
+                    vm.uniqueWeaponObtained = vm.weaponObtained.filter((c, index) => {
+                        return vm.weaponObtained.indexOf(c) !== index;
+                    });
+
+                    if (vm.uniqueWeaponObtained.length < 1) {
+                        let weaponObject = vm.weapons.find(x => x.name == vm.weaponLooted);
+                        ref.doc(vm.weaponLooted).set(weaponObject);
+                    }
+                }
+
+
+                vm.hit = false;
+            } else {
+                //boss
+                // 5 star weapons = 50% rate
+                if (vm.hit == false) {
+                    chance = Math.floor(Math.random() * 10);
+                    console.log(chance)
+                    if (chance <= 5) {
+                        // 50% chance of getting 3 star weapon
+                        var size = vm.weapons5.length;
+                        var i = Math.floor(Math.random() * size);
+                        vm.weaponLooted = vm.weapons5[i];
+                        console.log("weapon rewarded is " + vm.weaponLooted)
+                        vm.hit = true;
+                    }
+                }
+
+                // if chance does not hit then player does not receive any weapons
+                if (vm.hit == false) {
+                    vm.weaponLooted = "null";
+                }
+
+                //display weapon looted
+                if (vm.weaponLooted == "null") {
+                    alert("Haiya so close 😥. Better luck next time!")
+                } else {
+
+                    alert("Fuiyohh! You have received a " + vm.weaponLooted)
+
+                    //TODO
+                    //insert weapon into database
+                    //get weapon object
+                    vm.weaponObtained.push(vm.weaponLooted);
+
+                    //find duplicated values
+                    vm.uniqueWeaponObtained = vm.weaponObtained.filter((c, index) => {
+                        return vm.weaponObtained.indexOf(c) !== index;
+                    });
+
+                    if (vm.uniqueWeaponObtained.length < 1) {
+                        let weaponObject = vm.weapons.find(x => x.name == vm.weaponLooted);
+                        ref.doc(vm.weaponLooted).set(weaponObject);
+                    }
+                }
+            }
+        }
+
+        //TODO: 1
+        function updateCharacterStats(health, exp, damage, level) {
+            //get playerid
+            vm.userID = vm.userid.find(a => a.id).id;
+            //find player through id
+            let f = vm.users.find(f => f.id == vm.userID);
+
+            db.collection("users").doc(vm.userID).update({
+                health: health,
+                exp: exp,
+                damage: damage,
+                level: level,
+            }).then(() => {
+                console.log("player stats updated")
+            })
+
+        }
+
+
+        // function checkPlayer() {
+        //     //alert("test")
+
+        //     setTimeout(() => {
+        //         //TODO6 
+        //         //get playerid
+        //         vm.userID = vm.userid.find(a => a.id).id;
+        //         //find player through id
+        //         let f = vm.users.find(f => f.id == vm.userID);
+
+        //         if (f.character == "Traveler") {
+        //             vm.player = true;
+        //         } else {
+        //             vm.player = false;
+        //         }
+        //     }, 1000);
+        // }
+
+        // window.onbeforeunload = function () {
+        //     return "Dude, are you sure you want to leave? Think of the kittens!";
+        // }
+
+
+        //countdown
+
+        const Countdown = (() => {
+
+            let nextMidnight = new Date();
+            nextMidnight.setHours(23, 59, 0, 0);
+
+            const getRemainingTime = () => {
+                let now = new Date();
+                var currentDateTime = new Date();
+                var resultInSeconds = currentDateTime.getTime() / 1000;
+                //console.log(resultInSeconds)
+                let time = (nextMidnight.getTime() - now.getTime()) / 1000;
+                //console.log(nextMidnight.getTime())
+
+
+                if (time < 0) {
+                    nextMidnight = new Date();
+                    nextMidnight.setHours(24, 0, 0, 0);
+
+                    // if(this.resultInSeconds == 0){
+                    //     location.reload();
+                    // }
+
+                    //this.nextRefresh = true;
+                    //$(".reward").css("pointer-events", "auto");
+                    /* if(resultInSeconds == 0){
+        alert("test")
+        console.log("walau")
+        this.nextRefresh = true;
+        
+    } */
+
+                    if (window.localStorage) {
+                        if (!localStorage.getItem('firstLoad')) {
+                            localStorage['firstLoad'] = true;
+                            window.location.reload();
+                        } else
+                            localStorage.removeItem('firstLoad');
+                    }
+                    // setTimeout(() => {
+                    //     // window.onload = function () {
+                    //     //     window.location.reload();
+                    //     //     if (!window.location.hash) {
+                    //     //         window.location = window.location + '#loaded';
+                    //     //         window.location.reload();
+                    //     //     }
+                    //     // }
+                    //     if (window.localStorage) {
+                    //         if (!localStorage.getItem('firstLoad')) {
+                    //             localStorage['firstLoad'] = true;
+                    //             window.location.reload();
+                    //         } else
+                    //             localStorage.removeItem('firstLoad');
+                    //     }
+                    // }, 1000);
+                    return getRemainingTime();
+
+                }
+
+
+                if (this.nextRefresh == true) {
+                    alert("test")
+                    $(".reward").css("pointer-events", "auto");
+                }
+
+                return time;
+            }
+
+            const parseTime = (time) => {
+                const hours = Math.floor(time / 3600);
+                let rest = time - (hours * 3600);
+                const minutes = Math.floor(rest / 60);
+                rest = rest - (minutes * 60);
+                const seconds = Math.floor(rest);
+                const milliseconds = (rest - seconds) * 1000;
+
+                return [hours, minutes, seconds, milliseconds];
+            };
+
+            const formatTime = (parsedTime) => {
+                return '<span class="hours">' + parsedTime[0] +
+                    '</span><span class="hSep">:</span><span class="minutes">' + ("0" + parsedTime[1])
+                    .slice(-2) + '</span><span class="mSep">:</span><span class="seconds">' + ("0" +
+                        parsedTime[2]).slice(-2) + '</span>';
+            };
+
+            const els = [];
+            let timeout;
+
+            return (el) => {
+                els.push(el);
+
+                if (!timeout) {
+
+                    const refresh = () => {
+                        const parsedTime = parseTime(getRemainingTime());
+                        const formattedTimes = formatTime(parsedTime);
+
+                        for (let i = 0, iend = els.length; i < iend; i++) {
+                            els[i].innerHTML = formattedTimes;
+                            //$(".reward").css("pointer-events", "auto");
+                        }
+
+                        setTimeout(() => {
+                            refresh();
+                        }, parsedTime[3]);
+                    };
+                    refresh();
+
+                } else el.innerHTML = formatTime(parseTime(getRemainingTime()));
+            };
+
+        })();
+
+        Countdown(document.getElementById('countdown'));
+        Countdown(document.getElementById('countdown-two'));
+    </script>
+</body>
+
+</html>

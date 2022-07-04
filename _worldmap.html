@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="image/logo1.png">
+    <link rel="stylesheet" href="css/app3.css">
+    <title>Traveler's Adventures</title>
+    <style>
+        main {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        #map {
+            border: 1px solid #333;
+            flex: 1 1 auto;
+        }
+
+        #info img {
+            border: 1px solid #333;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1><a href="_worldmap.html">Traveler's Adventures</a></h1>
+    </header>
+
+    <nav>
+        <a href="_worldmap.html">World Map 🗺️</a>
+        <a href="_game.html">Base 🏡</a>
+        <a href="_character.html">My Characters 🎮</a>
+        <a href="_myweapons.html">My Weapons ⚔️</a>
+        <a href="_leaderboard.html">Leaderboard 📈</a>
+        <a href="_enemy.html">Enemy Book 😈</a>
+        <a href="_weapons.html">Weapons Book ⚔️</a>
+        <a href="_dailyRewards.html">Daily Rewards 🎁</a>
+        <a href="index.html">Logout 🔓</a>
+    </nav>
+
+
+
+    <main id="app" v-cloak>
+        <div id="panel">
+            <button @click="home">Home</button>
+
+            <select v-model="type">
+                <!--we can change the map view provided by google-->
+                <option value="roadmap">Roadmap</option>
+                <option value="satellite">Satellite</option>
+                <option value="hybrid">Hybrid</option>
+                <option value="terrain">Terrain</option>
+            </select>
+        </div>
+
+        <div id="map"></div>
+    </main>
+
+    <div hidden>
+        <div id="info">
+            <b>Tunku Abdul Rahman University College</b><br>
+            Affortable and Quality Education<br>
+            <img src="image/taruc.png">
+        </div>
+    </div>
+
+    <script
+        src="https://maps.googleapis.com/maps/api/js?streetview?size=600x300&location=46.414382,10.013988&heading=151.78&pitch=-0.76&staticmap?lAFt_SGN_RE0C842ylvCMIEx0Wk=&libraries=geometry,drawing&key=AIzaSyBK2NU4WbHLPF83v_qhnnTwiUKhAmhCbWo&signature=2HPmHK06N-Y1RuJyZrtcRzk8dIk=">
+    </script>
+    <script src="js/jquery.slim.js"></script>
+    <script src="js/vue.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        // ====================================================================
+        // Vue
+        // ====================================================================
+
+        const audio1 = new Audio ('audio/genshin-teleport.mp3');
+        
+        const vm = new Vue({
+            el: '#app',
+            data: {
+                type: 'roadmap',
+                markers: [],
+            },
+            watch: {
+                type() {
+                    // TODO(2): Set map type id
+                    map.setMapTypeId(vm.type);
+                }
+            },
+            methods: {
+                home() {
+                    // TODO(3): Pan to center
+                    //map.setCenter(center); //-> without smooth panning
+                    //with smooth panning for close distance
+                    map.panTo(center);
+                }
+            }
+        });
+
+        // ====================================================================
+        // Google Maps 
+        // ====================================================================
+
+
+        //locations
+        const base = {
+            lat: 3.214951,
+            lng: 101.728449
+        };
+        const china = {
+            lat: 39.904155,
+            lng: 116.408317
+        };
+        const africa = {
+            lat: -33.92432500339443,
+            lng: 18.423829754450587
+        };
+        const us = {
+            lat: 38.898611159191596,
+            lng: -77.03665858310038
+        };
+        const brazil = {
+            lat: -15.797342612789414,
+            lng: -47.875679208847934
+        };
+        const antarctica = {
+            lat: -76.28940729134308,
+            lng: 22.966605132002734
+        };
+        const uk = {
+            lat: 51.501183028512244,
+            lng: -0.12475417578167868
+        };
+        const australia = {
+            lat: -33.869407451720015,
+            lng: 151.21290587413338
+        };
+        const hospital = {
+            lat: 44.07570262012044,
+            lng: -92.51686283110637
+        };
+
+        const gm = google.maps;
+
+        const center = {
+            lat: 3.215000,
+            lng: 101.730000
+        };
+
+        const map = new gm.Map($('#map')[0], {
+            center,
+            zoom: 5,
+            disableDefaultUI: true,
+            disableDoubleClickZoom: true,
+            clickableIcons: false,
+        });
+
+        function createMarker(position, location) {
+            let m = new gm.Marker({
+                position,
+                map,
+                draggable: false,
+                label: {
+                    text: location,
+                    fontSize: "0px",
+                },
+                icons: {
+                    url: "image/genshin/waypoint.png",
+                    scaledSize: new gm.Size(30, 80),
+                    //icon: lineSymbol1,
+                    //offset: "100%"
+                },
+            });
+
+
+            vm.markers.push(m);
+
+            // TODO(5): Marker event --> position_changed
+            m.addListener('position_changed', e => {
+                //Update line
+                let p1 = m1.getPosition();
+                let p2 = m2.getPosition();
+                let p3 = m3.getPosition();
+                let p4 = m4.getPosition();
+                let p5 = m5.getPosition();
+                let p6 = m6.getPosition();
+                let p7 = m7.getPosition();
+                let p8 = m8.getPosition();
+                let p9 = m9.getPosition();
+
+                //update center
+                let p = gm.geometry.spherical.interpolate(p1, p2, 0.5);
+                mc.setPosition(p);
+                // let q = gm.geometry.spherical.interpolate(p2, p3, 0.5);
+                // mc.setPosition(q);
+
+                //udpate center distance
+                let d = gm.geometry.spherical.computeDistanceBetween(p1, p2);
+                mc.setLabel((d / 1000).toFixed(2) + ' KM');
+            });
+
+            return m;
+        }
+
+        // TODO(1): Create points --> p1 & p2
+        const p1 = new gm.LatLng(base);
+        const p2 = new gm.LatLng(china);
+        const p3 = new gm.LatLng(africa);
+        const p4 = new gm.LatLng(us);
+        const p5 = new gm.LatLng(brazil);
+        const p6 = new gm.LatLng(antarctica);
+        const p7 = new gm.LatLng(uk);
+        const p8 = new gm.LatLng(australia);
+        const p9 = new gm.LatLng(hospital);
+
+        // TODO(2): Create markers --> m1 & m2
+        const m1 = createMarker(p1, "base");
+        const m2 = createMarker(p2, "china");
+        const m3 = createMarker(p3, "africa");
+        const m4 = createMarker(p4, "us");
+        const m5 = createMarker(p5, "brazil");
+        const m6 = createMarker(p6, "antarctica");
+        const m7 = createMarker(p7, "uk");
+        const m8 = createMarker(p8, "australia");
+        const m9 = createMarker(p9, "hospital");
+
+        // Define a symbol using SVG path notation, with an opacity of 1.
+        const lineSymbol = {
+            path: "M 0,-1 0,1",
+            strokeOpacity: 1,
+            scale: 4,
+        };
+
+        // Define the symbol, using one of the predefined paths ('CIRCLE')
+        // supplied by the Google Maps JavaScript API.
+        const lineSymbol1 = {
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 8,
+            strokeColor: "#393",
+        };
+
+        // TODO(3): Create polyline --> line
+        const line = new gm.Polyline({
+            map,
+            path: [p1, p2, p3, p4, p5, p6, p7, p8, p9, p4],
+            strokeColor: 'red',
+            strokeWeight: 10,
+            strokeOpacity: 0,
+            icons: [{
+                icon: lineSymbol,
+                // offset: "0",
+                offset: "100%",
+                repeat: "20px",
+            }, ],
+            geodesic: true,
+
+
+        });
+
+        animateMarkers(line);
+
+
+        const mc = new gm.Marker({
+            map,
+            position: center,
+            //icon: 'image/home-120.png',
+            icon: {
+                //path: gm.SymbolPath.FORWARD_OPEN_ARROW,
+                //path: gm.SymbolPath.FORWARD_CLOSED_ARROW,
+                //path: gm.SymbolPath.BACKWARD_CLOSED_ARROW,
+                //path: gm.SymbolPath.BACKWARD_OPEN_ARROW,
+                path: gm.SymbolPath.CIRCLE,
+                scale: 50,
+                strokeColor: 'red',
+                strokeWeight: 10,
+                // strokeOpacity: 0.5,
+                fillColor: 'white',
+                // fillOpacity: 0.75,
+                strokeOpacity: 0,
+                fillOpacity: 0,
+
+            },
+            // label: {
+            //     text: '0.00 KM',
+            //     fontSize: "0px",
+            // },
+            label: "",
+            draggable: false,
+        });
+        console.log(mc)
+
+        // TODO(7): Trigger position_changed event
+        gm.event.trigger(m1, 'position_changed');
+
+        for (let m of vm.markers) {
+            //console.log(m);
+            m.addListener('click', e => {
+                audio1.play();
+                var name = m.label.text;
+                console.log(name)
+                switch (name) {
+                    case "base":
+                        location = "_game.html";
+                        break;
+                    case "china":
+                        location = "_china.html";
+                        break;
+                    case "africa":
+                        location = "_africa.html";
+                        break;
+                    case "us":
+                        location = "_us.html";
+                        break;
+                    case "brazil":
+                        location = "_brazil.html";
+                        break;
+                    case "antarctica":
+                        location = "_antarctica.html";
+                        break;
+                    case "uk":
+                        location = "_uk.html";
+                        break;
+                    case "australia":
+                        location = "_australia.html";
+                        break;
+                    case "hospital":
+                        location = "_hospital.html";
+                        break;
+
+                }
+            });
+        }
+
+        // Use the DOM setInterval() function to change the offset of the symbol
+        // at fixed intervals.
+        function animateMarkers(line) {
+            let count = 0;
+
+            window.setInterval(() => {
+                count = (count + 1) % 200;
+
+                const icons = line.get("icons");
+
+                icons[0].offset = count / 2 + "%";
+                line.set("icons", icons);
+            }, 20);
+        }
+    </script>
+</body>
+
+</html>

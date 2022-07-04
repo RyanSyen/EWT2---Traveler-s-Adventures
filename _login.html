@@ -1,0 +1,62 @@
+<template id="login">
+    <div>
+        <h1>Login</h1>
+
+        <form class="form" @submit.prevent="submit">
+            <label>Username</label>
+            <input v-model.trim="id" required maxlength="40" @change="id = id.toUpperCase()" v-focus ref="id">
+
+            <label>Password</label>
+            <input v-model.trim="password" type="password" required maxlength="20">
+
+            <section>
+                <button>Login</button>
+                <button @click.prevent="reset">Reset</button>
+                <!-- <button @click.prevent="$router.push('/home')">Cancel</button> -->
+            </section>
+        </form>
+
+        <div id="firebaseui-container"></div>
+    </div>
+</template>
+
+
+<script>
+    Vue.component('login', {
+        template: '#login',
+        data: () => ({
+            id: '',
+            password: ''
+        }),
+        methods: {
+            submit() {
+                for (v of this.$root.users) {
+                    if (this.id == "ADMIN" && this.password == "12345") {
+                        alert('Login Successful. Welcome Back Admin.');
+                        location = 'admin.html';
+                        return;
+                    } else if (this.id == v.id && this.password == v.password) {
+                        alert('Login Successful. Welcome User.');
+                        location = '_game.html';
+                        return;
+                    }
+                    /* else {
+                        alert('Username or Password Wrong.');
+                        break;
+                    }  */
+                }
+                alert('Username or Password Wrong.');
+            },
+            reset() {
+                this.id = '';
+                this.password = '';
+                this.$refs.id.focus();
+            }
+        },
+
+        created() {
+            document.title = 'Login';
+        }
+
+    });
+</script>

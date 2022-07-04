@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="image/logo1.png">
+    <link rel="stylesheet" href="css/app3.css">
+    <title>Traveler's Adventures</title>
+</head>
+<body>
+    <header>
+        <h1><a href="index.html">Home</a></h1>
+    </header>
+
+    <nav>
+        <a href="#/register">Register</a>
+        <a href="#/login">Login</a>
+    </nav>
+
+    <main id="app" v-cloak>
+        <transition name="slide" mode="out-in" appear>
+            <router-view></router-view>
+        </transition>
+    </main>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="js/vue.js"></script>
+    <script src="js/vue-router.js"></script>
+    <script src="js/vuefire.js"></script>
+    <script src="js/jquery.slim.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        firebase.initializeApp({
+            projectId: 'apiwebservice-340215'
+        });
+
+        const ref = firebase.firestore().collection('users');
+        const ref1 = firebase.firestore().collection('userid');
+
+        Vue.use(Vuefire.firestorePlugin);
+
+        const router = new VueRouter({
+            routes: [
+                { path: '/home', component: load('home') },
+                { path: '/register', component: load('register') },
+                { path: '/login', component: load('login') },
+                { path: '/admin', component: load('admin') },
+                { path: '/update/:id', component: load('update') },
+                { path: '*', redirect: '/login' }
+            ]
+        });
+
+        const app = new Vue({
+            router,
+            el: '#app',
+            data: {
+                users: [],
+            },
+
+            firestore: {
+                users: ref,
+                userid: ref1
+            },
+
+            created() {
+                
+            }
+        });
+    </script>
+</body>
+</html>

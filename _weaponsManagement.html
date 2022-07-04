@@ -1,0 +1,136 @@
+<template id="weaponsManagement">
+    <div>
+        <h1>Weapons Management</h1>
+
+        <p>
+            <p>Search Weapon : </p>
+            <input type="search" v-model.trim="q" v-focus ref="q" placeholder="Weapon Name">
+        </p>
+
+        <p>
+            <button @click="restore">Restore</button>
+            <button @click="checkAll">Check All</button>
+            <button @click="uncheckAll">Uncheck All</button>
+            <button @click="removeChecked" :disabled="checked.length == 0">
+                Remove Checked ({{ checked.length }})
+            </button>
+        </p>
+
+        <p>
+            {{ checked }}
+            {{ $root.weapons.length }} weapon(s)
+        </p>
+
+        <table class="table">
+            <tr>
+                <th>Id</th>
+                <th @click="sort('name')" :class="css('name')">Name</th>
+                <th @click="sort('rarity')" :class="css('rarity')">Rarity ⭐</th>
+                <th @click="sort('dmg')" :class="css('dmg')">Damage 🗡️</th>
+                <th>Bonus Damage 🗡️</th>
+                <th>Bonus Rate %</th>
+                <th>Bonus HP 💓</th>
+                <th></th>
+            </tr>
+
+            <tr v-for="f of result">
+                <td>
+                    <input type="checkbox" v-model="checked" :value="f.id">
+                </td>
+                <td>{{ f.name }}</td>
+                <td>{{ f.rarity }}</td>
+                <td>{{ f.dmg }}</td>
+                <td>{{ f.bonus_dmg }}</td>
+                <td>{{ f.bonus_rate }}</td>
+                <td>{{ f.bonus_hp }}</td>
+                <td style="position: relative">
+                    <button @click="$router.push('/updateWeapon/' + f.id)">Update</button>
+                    <button @click="remove(f.id)">Remove</button>
+                    <img :src="f.photo">
+                </td>
+            </tr>
+        </table>
+    </div>
+</template>
+
+<script>
+    Vue.component('weaponsManagement', {
+        template: '#weaponsManagement',
+        data: () => ({
+            checked: [],
+            weapons: [],
+            field: 'id',
+            reverse: false,
+            q: ''
+        }),
+        computed: {
+            result() {
+                let arr = this.$root.weapons.slice(0);
+                let f = this.field;
+                let q = this.q.toUpperCase();
+
+                arr = arr.filter(s => s.name.toUpperCase().includes(q));
+
+                switch (f) {
+                    case 'id':
+                    case 'name':
+                        arr.sort((a, b) => a[f].localeCompare(b[f]));
+                        break;
+                    case 'rarity':
+                        arr.sort((a, b) => a[f] - b[f]);
+                        break;    
+                    case 'dmg':
+                        arr.sort((a, b) => a[f] - b[f]);
+                        break;              
+                    default:
+                        arr.sort((a, b) => a[f].localeCompare(b[f]));
+                        break;
+                }
+
+                if (this.reverse) { arr.reverse(); }
+                    
+                return arr;
+            }
+        },
+        methods: {
+            sort(f) {
+                if (f == this.field) {
+                    this.reverse = !this.reverse;
+                } 
+                else {
+                    this.reverse = false;
+                }
+                this.field = f;
+            },
+            css(f) {
+                if (f == this.field) {
+                    return this.reverse ? 'desc' : 'asc';
+                }
+            },
+            restore() {
+                this.$root.weapons.forEach(f => ref.doc(f.id).delete());
+
+                fetch('weapons.json')
+                    .then(resp => resp.json())
+                    .then(json => json.forEach(weapons => ref.doc().set(weapons)));         
+            },
+            remove(id) {
+                ref.doc(id).delete();
+            },
+            checkAll() {
+                this.checked = this.$root.weapons.map(f => f.id);
+            },
+            uncheckAll() {
+                this.checked = [];
+            },
+            removeChecked() {
+                this.checked.forEach(id => ref.doc(id).delete());
+                this.checked = [];
+            }
+        },
+
+        created() {
+            document.title = 'Weapons Management';
+        }
+    });
+</script>

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="image/logo1.png">
+    <link rel="stylesheet" href="css/app3.css">
+    <title>Traveler's Adventures</title>
+    <style>
+        .characters {
+            border: 2px solid #999;
+            margin: 50px 50px 5px 0;
+            position: relative;
+            float: left;
+            background-color: white;
+        }
+
+        .characters div {
+            position: absolute;
+            bottom: 0%;
+            background: #0009;
+            color: #fff;
+            width: 100%;
+            text-align: center;
+            padding: 5px;
+            box-sizing: border-box;
+            font-size: x-large;
+        }
+
+        .box :hover {
+            box-shadow: 5px 5px 5px #ccc;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1><a href="_worldmap.html">Traveler's Adventures</a></h1>
+    </header>
+
+    <nav>
+        <a href="_worldmap.html">World Map 🗺️</a>
+        <a href="_game.html">Base 🏡</a>
+        <a href="_character.html">My Characters 🎮</a>
+        <a href="_myweapons.html">My Weapons ⚔️</a>
+        <a href="_leaderboard.html">Leaderboard 📈</a>
+        <a href="_enemy.html">Enemy Book 😈</a>
+        <a href="_weapons.html">Weapons Book ⚔️</a>
+        <a href="_dailyRewards.html">Daily Rewards 🎁</a>
+        <a href="index.html">Logout 🔓</a>
+    </nav>
+
+    <main id="app" v-cloak>
+        <h1>Characters</h1>
+        <div id="panel">
+            {{ characters.length }} character(s)
+        </div>
+
+        <transition-group tag="div" name="fade" appear class="box">
+            <div class="characters" style="cursor: pointer;" v-for="c of characters" :key="c.id" v-on:click="choose">
+                <img :src="c.photo" :id="c.id">
+                <div>{{ c.name }}</div>
+            </div>
+        </transition-group>
+
+    </main>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key="></script>
+    <script src="js/jquery.slim.js"></script>
+    <script src="js/vue.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/vuefire.js"></script>
+
+    <script>
+        firebase.initializeApp({
+            projectId: 'apiwebservice-340215'
+        });
+
+        const db = firebase.firestore();
+        const ref1 = db.collection('users');
+        const ref2 = db.collection('userid');
+
+        Vue.use(Vuefire.firestorePlugin);
+
+        const vm = new Vue({
+            el: '#app',
+            data: {
+                characters: [],
+                users: [],
+                userid: [],
+                character1: "Traveler",
+                character1img: "image/traveler.png",
+                character2: "Lumine",
+                character2img: "image/lumine.png",
+            },
+            methods: {
+                choose(e) {
+                    let el = e.target.id;
+                    //get playerid
+                    let id = vm.userid.find(a => a.id).id;
+                    //console.log(id)
+                    //find player through id
+                    let f = vm.users.find(f => f.id == id);
+                    //for (r of this.characters) {
+                    switch (el) {
+                        case "1":
+
+                            /* if (f.character == this.character1) {
+                                alert("Equipped already");
+                                // return;
+                            } else {
+                                alert("run")
+                                setTimeout(() => {
+                                    ref1.doc(id).update({
+                                        character: this.character1,
+                                    })
+                                    alert('Welcome To The Game. Traveler.');
+                                    location = '_game.html';
+                                }, 1000);
+
+                            } */
+
+
+                            if (f.character != this.character1) {
+                                alert('Welcome To The Game. Traveler.');
+                                ref1.doc(id).update({
+                                    character: this.character1,
+                                    photo: this.character1img
+                                })
+                                setTimeout(() => {
+
+                                    location = '_game.html';
+                                }, 500);
+                                // return;
+                            } else {
+
+                                alert("Equipped already");
+                            }
+                            break;
+                        case "2":
+                            // //get playerid
+                            // let id1 = vm.userid.find(a => a.id).id;
+                            // //find player through id
+                            // let f1 = vm.users.find(f => f.id == id1);
+                            /* if (f.character == this.character2) {
+
+                                alert("Equipped already");
+                                // return;
+                            } else {
+                                setTimeout(() => {
+                                    ref1.doc(id).update({
+                                        character: this.character2,
+                                    })
+                                    alert('Welcome To The Game. Lumine.');
+                                    location = '_game.html';
+                                }, 1000);
+                                //setTimeout(() => {
+                                //alert('Welcome To The Game. Lumine.');
+                                //location = '_game.html';
+                                //}, 3000);
+                            } */
+                            if (f.character != this.character2) {
+                                alert('Welcome To The Game. Lumine.');
+                                ref1.doc(id).update({
+                                    character: this.character2,
+                                    photo: this.character2img
+                                })
+                                setTimeout(() => {
+                                    location = '_game.html';
+                                }, 500);
+                                // return;
+                            } else {
+
+                                alert("Equipped already");
+                                //setTimeout(() => {
+                                //alert('Welcome To The Game. Lumine.');
+                                //location = '_game.html';
+                                //}, 3000);
+                            }
+                            //return;
+                            break;
+                    }
+                    //}
+
+
+                },
+            },
+            created() {
+                fetch('characters.json')
+                    .then(resp => resp.json())
+                    .then(json => this.characters = json);
+
+
+                db.collection("users").get().then(snap => {
+                    snap.forEach(doc => {
+                        let f = {
+                            id: doc.id,
+                            ...doc.data()
+                        };
+                        this.users.push(f);
+                        //console.log(this.myweapon)
+                    });
+                });
+
+                db.collection("userid").get().then(snap => {
+                    snap.forEach(doc => {
+                        let f = {
+                            id: doc.id,
+                            ...doc.data()
+                        };
+                        this.userid.push(f);
+                        //console.log(this.myweapon)
+                    });
+                });
+            }
+        })
+    </script>
+</body>
+
+</html>

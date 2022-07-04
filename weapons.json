@@ -1,0 +1,171 @@
+[{
+        "id": "1",
+        "name": "Aquila Favonia",
+        "photo": "image\\genshin\\weapon\\5star\\Aquila_Favonia.png",
+        "rarity": "5",
+        "dmg": "48",
+        "bonus_dmg": "90",
+        "bonus_rate": "50",
+        "bonus_hp": "65"
+    },
+    {
+        "id": "2",
+        "name": "Haran Geppaku Futsu",
+        "photo": "image\\genshin\\weapon\\5star\\Haran_Geppaku_Futsu.png",
+        "rarity": "5",
+        "dmg": "46",
+        "bonus_dmg": "94",
+        "bonus_rate": "45",
+        "bonus_hp": "75"
+    },
+    {
+        "id": "3",
+        "name": "Skyward Blade",
+        "photo": "image\\genshin\\weapon\\5star\\Skyward_Blade.png",
+        "rarity": "5",
+        "dmg": "49",
+        "bonus_dmg": "92",
+        "bonus_rate": "33",
+        "bonus_hp": "70"
+    },
+    {
+        "id": "4",
+        "name": "Amenoma Kageuchi",
+        "photo": "image\\genshin\\weapon\\4star\\Amenoma_Kageuchi.png",
+        "rarity": "4",
+        "dmg": "41",
+        "bonus_dmg": "90",
+        "bonus_rate": "50",
+        "bonus_hp": "45"
+    },
+    {
+        "id": "5",
+        "name": "Blackcliff Longsword",
+        "photo": "image\\genshin\\weapon\\4star\\Blackcliff_Longsword.png",
+        "rarity": "4",
+        "dmg": "41",
+        "bonus_dmg": "84",
+        "bonus_rate": "45",
+        "bonus_hp": "42"
+    },
+    {
+        "id": "6",
+        "name": "Sacrificial Sword",
+        "photo": "image\\genshin\\weapon\\4star\\Sacrificial_Sword.png",
+        "rarity": "4",
+        "dmg": "42",
+        "bonus_dmg": "82",
+        "bonus_rate": "43",
+        "bonus_hp": "41"
+    },
+    {
+        "id": "7",
+        "name": "The Alley Flash",
+        "photo": "image\\genshin\\weapon\\4star\\The_Alley_Flash.png",
+        "rarity": "4",
+        "dmg": "45",
+        "bonus_dmg": "82",
+        "bonus_rate": "33",
+        "bonus_hp": "41"
+    },
+    {
+        "id": "8",
+        "name": "The Black Sword",
+        "photo": "image\\genshin\\weapon\\4star\\The_Black_Sword.png",
+        "rarity": "4",
+        "dmg": "43",
+        "bonus_dmg": "80",
+        "bonus_rate": "50",
+        "bonus_hp": "40"
+    },
+    {
+        "id": "9",
+        "name": "The Flute",
+        "photo": "image\\genshin\\weapon\\4star\\The_Flute.png",
+        "rarity": "4",
+        "dmg": "39",
+        "bonus_dmg": "85",
+        "bonus_rate": "55",
+        "bonus_hp": "42"
+    },
+    {
+        "id": "10",
+        "name": "Cool Steel",
+        "photo": "image\\genshin\\weapon\\3star\\Cool_Steel.png",
+        "rarity": "3",
+        "dmg": "38",
+        "bonus_dmg": "78",
+        "bonus_rate": "33",
+        "bonus_hp": "0"
+    },
+    {
+        "id": "11",
+        "name": "Dark Iron Sword",
+        "photo": "image\\genshin\\weapon\\3star\\Dark_Iron_Sword.png",
+        "rarity": "3",
+        "dmg": "40",
+        "bonus_dmg": "70",
+        "bonus_rate": "45",
+        "bonus_hp": "0"
+    },
+    {
+        "id": "12",
+        "name": "Fillet Blade",
+        "photo": "image\\genshin\\weapon\\3star\\Fillet_Blade.png",
+        "rarity": "3",
+        "dmg": "37",
+        "bonus_dmg": "75",
+        "bonus_rate": "45",
+        "bonus_hp": "0"
+    },
+    {
+        "id": "13",
+        "name": "Harbinger of Dawn",
+        "photo": "image\\genshin\\weapon\\3star\\Harbinger_of_Dawn.png",
+        "rarity": "3",
+        "dmg": "32",
+        "bonus_dmg": "80",
+        "bonus_rate": "43",
+        "bonus_hp": "0"
+    },
+    {
+        "id": "14",
+        "name": "Skyrider Sword",
+        "photo": "image\\genshin\\weapon\\3star\\Skyrider_Sword.png",
+        "rarity": "3",
+        "dmg": "35",
+        "bonus_dmg": "82",
+        "bonus_rate": "33",
+        "bonus_hp": "0"
+    },
+    {
+        "id": "15",
+        "name": "Traveler's Handy Sword",
+        "photo": "image\\genshin\\weapon\\3star\\Traveler's_Handy_Sword.png",
+        "rarity": "3",
+        "dmg": "34",
+        "bonus_dmg": "79",
+        "bonus_rate": "50",
+        "bonus_hp": "0"
+    },
+    {
+        "id": "16",
+        "name": "Silver Sword",
+        "photo": "image\\genshin\\weapon\\Silver_Sword.png",
+        "rarity": "2",
+        "dmg": "25",
+        "bonus_dmg": "0",
+        "bonus_rate": "0",
+        "bonus_hp": "0"
+    },
+    {
+        "id": "17",
+        "name": "Dull Blade",
+        "photo": "image\\genshin\\weapon\\Dull_Blade.png",
+        "rarity": "1",
+        "dmg": "10",
+        "bonus_dmg": "0",
+        "bonus_rate": "0",
+        "bonus_hp": "0"
+    }
+]

@@ -1,0 +1,1041 @@
+[{
+        "id": "1",
+        "name": "Pyro Slime",
+        "photo": "image\\genshin\\enemy\\slimes\\Pyro_Slime.png",
+        "type": "Slimes",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "2",
+        "name": "Cryo Slime",
+        "photo": "image\\genshin\\enemy\\slimes\\Cryo_Slime.png",
+        "type": "Slimes",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "3",
+        "name": "Hydro Slime",
+        "photo": "image\\genshin\\enemy\\slimes\\Hydro_Slime.png",
+        "type": "Slimes",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "4",
+        "name": "Electro Slime",
+        "photo": "image\\genshin\\enemy\\slimes\\Electro_Slime.png",
+        "type": "Slimes",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "5",
+        "name": "Geo Slime",
+        "photo": "image\\genshin\\enemy\\slimes\\Geo_Slime.png",
+        "type": "Slimes",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "6",
+        "name": "Dendro Slime",
+        "photo": "image\\genshin\\enemy\\slimes\\Dendro_Slime.png",
+        "type": "Slimes",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "7",
+        "name": "Anemo Slime",
+        "photo": "image\\genshin\\enemy\\slimes\\Anemo_Slime.png",
+        "type": "Slimes",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "8",
+        "name": "Mutant Electro Slime",
+        "photo": "image\\genshin\\enemy\\slimes\\Mutant_Electro_Slime.png",
+        "type": "Slimes",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "9",
+        "name": "Pyro Hilichurl",
+        "photo": "image\\genshin\\enemy\\hilichurls\\Pyro_Hilichurl.png",
+        "type": "Hilichurls",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "10",
+        "name": "Cryo Hilichurl",
+        "photo": "image\\genshin\\enemy\\hilichurls\\Cryo_Hilichurl.png",
+        "type": "Hilichurls",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "11",
+        "name": "Wooden Hilichurl",
+        "photo": "image\\genshin\\enemy\\hilichurls\\Wooden_Hilichurl.png",
+        "type": "Hilichurls",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "12",
+        "name": "Electro Hilichurl",
+        "photo": "image\\genshin\\enemy\\hilichurls\\Electro_Hilichurl.png",
+        "type": "Hilichurls",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "13",
+        "name": "Cryo Samachurl",
+        "photo": "image\\genshin\\enemy\\hilichurls\\Cryo_Samachurl.png",
+        "type": "Hilichurls",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "14",
+        "name": "Geo Samachurl",
+        "photo": "image\\genshin\\enemy\\hilichurls\\Geo_Samachurl.png",
+        "type": "Hilichurls",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "15",
+        "name": "Hydro Samachurl",
+        "photo": "image\\genshin\\enemy\\hilichurls\\Hydro_Samachurl.png",
+        "type": "Hilichurls",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "16",
+        "name": "Dendro Samachurl",
+        "photo": "image\\genshin\\enemy\\hilichurls\\Dendro_Samachurl.png",
+        "type": "Hilichurls",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "17",
+        "name": "Anemo Samachurl",
+        "photo": "image\\genshin\\enemy\\hilichurls\\Anemo_Samachurl.png",
+        "type": "Hilichurls",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "18",
+        "name": "Electro Samachurl",
+        "photo": "image\\genshin\\enemy\\hilichurls\\Electro_Samachurl.png",
+        "type": "Hilichurls",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "19",
+        "name": "Unusual Hilichurl",
+        "photo": "image\\genshin\\enemy\\hilichurls\\Unusual_Hilichurl.png",
+        "type": "Hilichurls",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "20",
+        "name": "Frostarm Lawachurl",
+        "photo": "image\\genshin\\enemy\\hilichurls\\Frostarm_Lawachurl.png",
+        "type": "Hilichurls",
+        "level": "Medium",
+        "exp": "50",
+        "health": "75",
+        "dmg": "50"
+    },
+    {
+        "id": "21",
+        "name": "Stonehide Lawachurl",
+        "photo": "image\\genshin\\enemy\\hilichurls\\Stonehide_Lawachurl.png",
+        "type": "Hilichurls",
+        "level": "Medium",
+        "exp": "50",
+        "health": "75",
+        "dmg": "50"
+    },
+    {
+        "id": "22",
+        "name": "Thunderhelm Lawachurl",
+        "photo": "image\\genshin\\enemy\\hilichurls\\Thunderhelm_Lawachurl.png",
+        "type": "Hilichurls",
+        "level": "Medium",
+        "exp": "50",
+        "health": "75",
+        "dmg": "50"
+    },
+    {
+        "id": "23",
+        "name": "Axe Mitachurl",
+        "photo": "image\\genshin\\enemy\\hilichurls\\Axe_Mitachurl.png",
+        "type": "Hilichurls",
+        "level": "Medium",
+        "exp": "50",
+        "health": "75",
+        "dmg": "50"
+    },
+    {
+        "id": "24",
+        "name": "Pyro Abyss Mage",
+        "photo": "image\\genshin\\enemy\\abyss\\Pyro_Abyss_Mage.png",
+        "type": "The Abyss",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "25",
+        "name": "Cryo Abyss Mage",
+        "photo": "image\\genshin\\enemy\\abyss\\Cryo_Abyss_Mage.png",
+        "type": "The Abyss",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "26",
+        "name": "Hydro Abyss Mage",
+        "photo": "image\\genshin\\enemy\\abyss\\Hydro_Abyss_Mage.png",
+        "type": "The Abyss",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "27",
+        "name": "Electro Abyss Mage",
+        "photo": "image\\genshin\\enemy\\abyss\\Electro_Abyss_Mage.png",
+        "type": "The Abyss",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "28",
+        "name": "Abyss Herald Wicked Torrents",
+        "photo": "image\\genshin\\enemy\\abyss\\Abyss_Herald_Wicked_Torrents.png",
+        "type": "The Abyss",
+        "level": "Medium",
+        "exp": "50",
+        "health": "75",
+        "dmg": "50"
+    },
+    {
+        "id": "29",
+        "name": "Abyss Lector Violet Lightning",
+        "photo": "image\\genshin\\enemy\\abyss\\Abyss_Lector_Violet_Lightning.png",
+        "type": "The Abyss",
+        "level": "Medium",
+        "exp": "50",
+        "health": "75",
+        "dmg": "50"
+    },
+    {
+        "id": "30",
+        "name": "Abyss Lector Fathomless Flames",
+        "photo": "image\\genshin\\enemy\\abyss\\Abyss_Lector_Fathomless_Flames.png",
+        "type": "The Abyss",
+        "level": "Medium",
+        "exp": "50",
+        "health": "75",
+        "dmg": "50"
+    },
+    {
+        "id": "31",
+        "name": "Rockfond Rifthound Whelp",
+        "photo": "image\\genshin\\enemy\\rifthounds\\Rockfond_Rifthound_Whelp.png",
+        "type": "Rifthounds",
+        "level": "Medium",
+        "exp": "50",
+        "health": "75",
+        "dmg": "50"
+    },
+    {
+        "id": "32",
+        "name": "Rockfond Rifthound",
+        "photo": "image\\genshin\\enemy\\rifthounds\\Rockfond_Rifthound.png",
+        "type": "Rifthounds",
+        "level": "Medium",
+        "exp": "50",
+        "health": "75",
+        "dmg": "50"
+    },
+    {
+        "id": "33",
+        "name": "Thundercraven Rifthound Whelp",
+        "photo": "image\\genshin\\enemy\\rifthounds\\Thundercraven_Rifthound_Whelp.png",
+        "type": "Rifthounds",
+        "level": "Medium",
+        "exp": "50",
+        "health": "75",
+        "dmg": "50"
+    },
+    {
+        "id": "34",
+        "name": "Thundercraven Rifthound",
+        "photo": "image\\genshin\\enemy\\rifthounds\\Thundercraven_Rifthound.png",
+        "type": "Rifthounds",
+        "level": "Medium",
+        "exp": "50",
+        "health": "75",
+        "dmg": "50"
+    },
+    {
+        "id": "35",
+        "name": "Standard Bearer",
+        "photo": "image\\genshin\\enemy\\shadowy_husks\\Standard_Bearer.png",
+        "type": "Shadowy Husks",
+        "level": "Medium",
+        "exp": "50",
+        "health": "75",
+        "dmg": "50"
+    },
+    {
+        "id": "36",
+        "name": "Line Breaker",
+        "photo": "image\\genshin\\enemy\\shadowy_husks\\Line_Breaker.png",
+        "type": "Shadowy Husks",
+        "level": "Medium",
+        "exp": "50",
+        "health": "75",
+        "dmg": "50"
+    },
+    {
+        "id": "37",
+        "name": "Defender",
+        "photo": "image\\genshin\\enemy\\shadowy_husks\\Defender.png",
+        "type": "Shadowy Husks",
+        "level": "Medium",
+        "exp": "50",
+        "health": "75",
+        "dmg": "50"
+    },
+    {
+        "id": "38",
+        "name": "Pyro Potioneer",
+        "photo": "image\\genshin\\enemy\\treasure_hoarders\\Pyro_Potioneer.png",
+        "type": "Treasure Hoarders",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "39",
+        "name": "Seaman",
+        "photo": "image\\genshin\\enemy\\treasure_hoarders\\Seaman.png",
+        "type": "Treasure Hoarders",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "40",
+        "name": "Handyman",
+        "photo": "image\\genshin\\enemy\\treasure_hoarders\\Handyman.png",
+        "type": "Treasure Hoarders",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "41",
+        "name": "Hydro Potioneer",
+        "photo": "image\\genshin\\enemy\\treasure_hoarders\\Hydro_Potioneer.png",
+        "type": "Treasure Hoarders",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "42",
+        "name": "Scout",
+        "photo": "image\\genshin\\enemy\\treasure_hoarders\\Scout.png",
+        "type": "Treasure Hoarders",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "43",
+        "name": "Marksman",
+        "photo": "image\\genshin\\enemy\\treasure_hoarders\\Marksman.png",
+        "type": "Treasure Hoarders",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "44",
+        "name": "Gravedigger",
+        "photo": "image\\genshin\\enemy\\treasure_hoarders\\Gravedigger.png",
+        "type": "Treasure Hoarders",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "45",
+        "name": "Cryo Potioneer",
+        "photo": "image\\genshin\\enemy\\treasure_hoarders\\Cryo_Potioneer.png",
+        "type": "Treasure Hoarders",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "46",
+        "name": "Crusher",
+        "photo": "image\\genshin\\enemy\\treasure_hoarders\\Crusher.png",
+        "type": "Treasure Hoarders",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "47",
+        "name": "Electro Potioneer",
+        "photo": "image\\genshin\\enemy\\treasure_hoarders\\Electro_Potioneer.png",
+        "type": "Treasure Hoarders",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "48",
+        "name": "Dancing Thunder",
+        "photo": "image\\genshin\\enemy\\nobushi\\Dancing_Thunder.png",
+        "type": "Nobushi",
+        "level": "Medium",
+        "exp": "50",
+        "health": "75",
+        "dmg": "50"
+    },
+    {
+        "id": "49",
+        "name": "Kikouban",
+        "photo": "image\\genshin\\enemy\\nobushi\\Kikouban.png",
+        "type": "Nobushi",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "50",
+        "name": "Hitsukeban",
+        "photo": "image\\genshin\\enemy\\nobushi\\Hitsukeban.png",
+        "type": "Nobushi",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "51",
+        "name": "Fiery Might",
+        "photo": "image\\genshin\\enemy\\nobushi\\Fiery_Might.png",
+        "type": "Nobushi",
+        "level": "Medium",
+        "exp": "50",
+        "health": "75",
+        "dmg": "50"
+    },
+    {
+        "id": "52",
+        "name": "Jintouban",
+        "photo": "image\\genshin\\enemy\\nobushi\\Jintouban.png",
+        "type": "Nobushi",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "53",
+        "name": "Pyro Agent",
+        "photo": "image\\genshin\\enemy\\fatui\\Pyro_Agent.png",
+        "type": "Fatui",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "54",
+        "name": "Cryo Gunner Legionnaire",
+        "photo": "image\\genshin\\enemy\\fatui\\Cryo_Gunner_Legionnaire.png",
+        "type": "Fatui",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "55",
+        "name": "Hydro Gunner Legionnaire",
+        "photo": "image\\genshin\\enemy\\fatui\\Hydro_Gunner_Legionnaire.png",
+        "type": "Fatui",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "56",
+        "name": "Electro Hammer Vanguard",
+        "photo": "image\\genshin\\enemy\\fatui\\Electro_Hammer_Vanguard.png",
+        "type": "Fatui",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "57",
+        "name": "Cryo Cicin Mage",
+        "photo": "image\\genshin\\enemy\\fatui\\Cryo_Cicin_Mage.png",
+        "type": "Fatui",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "58",
+        "name": "Pyro Slinger Bracer",
+        "photo": "image\\genshin\\enemy\\fatui\\Pyro_Slinger_Bracer.png",
+        "type": "Fatui",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "59",
+        "name": "Anemoboxer Vanguard",
+        "photo": "image\\genshin\\enemy\\fatui\\Anemoboxer_Vanguard.png",
+        "type": "Fatui",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "60",
+        "name": "Electro Cicin Mage",
+        "photo": "image\\genshin\\enemy\\fatui\\Electro_Cicin_Mage.png",
+        "type": "Fatui",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "61",
+        "name": "Geochanter Bracer",
+        "photo": "image\\genshin\\enemy\\fatui\\Geochanter_Bracer.png",
+        "type": "Fatui",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "62",
+        "name": "Mirror Maiden",
+        "photo": "image\\genshin\\enemy\\fatui\\Mirror_Maiden.png",
+        "type": "Fatui",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "63",
+        "name": "Ruin Guard",
+        "photo": "image\\genshin\\enemy\\automatons\\Ruin_Guard.png",
+        "type": "Automatons",
+        "level": "Medium",
+        "exp": "50",
+        "health": "75",
+        "dmg": "50"
+    },
+    {
+        "id": "64",
+        "name": "Ruin Hunter",
+        "photo": "image\\genshin\\enemy\\automatons\\Ruin_Hunter.png",
+        "type": "Automatons",
+        "level": "Medium",
+        "exp": "50",
+        "health": "75",
+        "dmg": "50"
+    },
+    {
+        "id": "65",
+        "name": "Ruin Grader",
+        "photo": "image\\genshin\\enemy\\automatons\\Ruin_Grader.png",
+        "type": "Automatons",
+        "level": "Medium",
+        "exp": "50",
+        "health": "75",
+        "dmg": "50"
+    },
+    {
+        "id": "66",
+        "name": "Ruin Scout",
+        "photo": "image\\genshin\\enemy\\automatons\\Ruin_Scout.png",
+        "type": "Automatons",
+        "level": "Medium",
+        "exp": "50",
+        "health": "75",
+        "dmg": "50"
+    },
+    {
+        "id": "67",
+        "name": "Ruin Defender",
+        "photo": "image\\genshin\\enemy\\automatons\\Ruin_Defender.png",
+        "type": "Automatons",
+        "level": "Medium",
+        "exp": "50",
+        "health": "75",
+        "dmg": "50"
+    },
+    {
+        "id": "68",
+        "name": "Ruin Destroyer",
+        "photo": "image\\genshin\\enemy\\automatons\\Ruin_Destroyer.png",
+        "type": "Automatons",
+        "level": "Medium",
+        "exp": "50",
+        "health": "75",
+        "dmg": "50"
+    },
+    {
+        "id": "69",
+        "name": "Geovishap Hatchling",
+        "photo": "image\\genshin\\enemy\\vishaps\\Geovishap_Hatchling.png",
+        "type": "Vishaps",
+        "level": "Medium",
+        "exp": "50",
+        "health": "75",
+        "dmg": "50"
+    },
+    {
+        "id": "70",
+        "name": "Bolteater Bathysmal Vishap",
+        "photo": "image\\genshin\\enemy\\vishaps\\Bolteater_Bathysmal_Vishap.png",
+        "type": "Vishaps",
+        "level": "Medium",
+        "exp": "50",
+        "health": "75",
+        "dmg": "50"
+    },
+    {
+        "id": "71",
+        "name": "Rimebiter Bathysmal Vishap",
+        "photo": "image\\genshin\\enemy\\vishaps\\Rimebiter_Bathysmal_Vishap.png",
+        "type": "Vishaps",
+        "level": "Medium",
+        "exp": "50",
+        "health": "75",
+        "dmg": "50"
+    },
+    {
+        "id": "72",
+        "name": "Primordial Bathysmal Vishap",
+        "photo": "image\\genshin\\enemy\\vishaps\\Primordial_Bathysmal_Vishap.png",
+        "type": "Vishaps",
+        "level": "Medium",
+        "exp": "50",
+        "health": "75",
+        "dmg": "50"
+    },
+    {
+        "id": "73",
+        "name": "Cryo Whopperflower",
+        "photo": "image\\genshin\\enemy\\whopperflowers\\Cryo_Whopperflower.png",
+        "type": "Whopperflowers",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "74",
+        "name": "Pyro Whopperflower",
+        "photo": "image\\genshin\\enemy\\whopperflowers\\Pyro_Whopperflower.png",
+        "type": "Whopperflowers",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "75",
+        "name": "Electro Whopperflower",
+        "photo": "image\\genshin\\enemy\\whopperflowers\\Electro_Whopperflower.png",
+        "type": "Whopperflowers",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "76",
+        "name": "Hydro Specter",
+        "photo": "image\\genshin\\enemy\\specter\\Hydro_Specter.png",
+        "type": "Specters",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "77",
+        "name": "Geo Specter",
+        "photo": "image\\genshin\\enemy\\specter\\Geo_Specter.png",
+        "type": "Specters",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "78",
+        "name": "Anemo Specter",
+        "photo": "image\\genshin\\enemy\\specter\\Anemo_Specter.png",
+        "type": "Specters",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "79",
+        "name": "Pyro Specter",
+        "photo": "image\\genshin\\enemy\\specter\\Pyro_Specter.png",
+        "type": "Specters",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "80",
+        "name": "Cryo Specter",
+        "photo": "image\\genshin\\enemy\\specter\\Cryo_Specter.png",
+        "type": "Specters",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "81",
+        "name": "Electro Specter",
+        "photo": "image\\genshin\\enemy\\specter\\Electro_Specter.png",
+        "type": "Specters",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "82",
+        "name": "Cryo Cicin",
+        "photo": "image\\genshin\\enemy\\cicins\\Cryo_Cicin.png",
+        "type": "Cicins",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "83",
+        "name": "Hydro Cicin",
+        "photo": "image\\genshin\\enemy\\cicins\\Hydro_Cicin.png",
+        "type": "Cicins",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "84",
+        "name": "Electro Cicin",
+        "photo": "image\\genshin\\enemy\\cicins\\Electro_Cicin.png",
+        "type": "Cicins",
+        "level": "Easy",
+        "exp": "25",
+        "health": "50",
+        "dmg": "25"
+    },
+    {
+        "id": "85",
+        "name": "Stormterror Dvalin",
+        "photo": "image\\genshin\\enemy\\boss\\Stormterror_Dvalin.png",
+        "type": "Boss",
+        "level": "Hard",
+        "exp": "100",
+        "health": "100",
+        "dmg": "80"
+    },
+    {
+        "id": "86",
+        "name": "Lupus Boreas",
+        "photo": "image\\genshin\\enemy\\boss\\Lupus_Boreas.png",
+        "type": "Boss",
+        "level": "Hard",
+        "exp": "100",
+        "health": "100",
+        "dmg": "80"
+    },
+    {
+        "id": "87",
+        "name": "Childe",
+        "photo": "image\\genshin\\enemy\\boss\\Childe.png",
+        "type": "Boss",
+        "level": "Hard",
+        "exp": "100",
+        "health": "100",
+        "dmg": "80"
+    },
+    {
+        "id": "88",
+        "name": "Azhdaha",
+        "photo": "image\\genshin\\enemy\\boss\\Azhdaha.png",
+        "type": "Boss",
+        "level": "Hard",
+        "exp": "100",
+        "health": "100",
+        "dmg": "80"
+    },
+    {
+        "id": "89",
+        "name": "La Signora",
+        "photo": "image\\genshin\\enemy\\boss\\La_Signora.png",
+        "type": "Boss",
+        "level": "Hard",
+        "exp": "100",
+        "health": "100",
+        "dmg": "80"
+    },
+    {
+        "id": "90",
+        "name": "Raiden Shogun",
+        "photo": "image\\genshin\\enemy\\boss\\Raiden_Shogun.png",
+        "type": "Boss",
+        "level": "Hard",
+        "exp": "100",
+        "health": "100",
+        "dmg": "80"
+    },
+    {
+        "id": "91",
+        "name": "Anemo Hypostasis",
+        "photo": "image\\genshin\\enemy\\boss\\Anemo_Hypostasis.png",
+        "type": "Boss",
+        "level": "Hard",
+        "exp": "100",
+        "health": "100",
+        "dmg": "80"
+    },
+    {
+        "id": "92",
+        "name": "Cryo Hypostasis",
+        "photo": "image\\genshin\\enemy\\boss\\Cryo_Hypostasis.png",
+        "type": "Boss",
+        "level": "Hard",
+        "exp": "100",
+        "health": "100",
+        "dmg": "80"
+    },
+    {
+        "id": "93",
+        "name": "Geo Hypostasis",
+        "photo": "image\\genshin\\enemy\\boss\\Geo_Hypostasis.png",
+        "type": "Boss",
+        "level": "Hard",
+        "exp": "100",
+        "health": "100",
+        "dmg": "80"
+    },
+    {
+        "id": "94",
+        "name": "Electro Hypostasis",
+        "photo": "image\\genshin\\enemy\\boss\\Electro_Hypostasis.png",
+        "type": "Boss",
+        "level": "Hard",
+        "exp": "100",
+        "health": "100",
+        "dmg": "80"
+    },
+    {
+        "id": "95",
+        "name": "Cryo Regisvine",
+        "photo": "image\\genshin\\enemy\\boss\\Cryo_Regisvine.png",
+        "type": "Boss",
+        "level": "Hard",
+        "exp": "100",
+        "health": "100",
+        "dmg": "80"
+    },
+    {
+        "id": "96",
+        "name": "Oceanid",
+        "photo": "image\\genshin\\enemy\\boss\\Oceanid.png",
+        "type": "Boss",
+        "level": "Hard",
+        "exp": "100",
+        "health": "100",
+        "dmg": "80"
+    },
+    {
+        "id": "97",
+        "name": "Hydro Hypostasis",
+        "photo": "image\\genshin\\enemy\\boss\\Hydro_Hypostasis.png",
+        "type": "Boss",
+        "level": "Hard",
+        "exp": "100",
+        "health": "100",
+        "dmg": "80"
+    },
+    {
+        "id": "98",
+        "name": "Pyro Hypostasis",
+        "photo": "image\\genshin\\enemy\\boss\\Pyro_Hypostasis.png",
+        "type": "Boss",
+        "level": "Hard",
+        "exp": "100",
+        "health": "100",
+        "dmg": "80"
+    },
+    {
+        "id": "99",
+        "name": "Bathysmal Vishap Herd",
+        "photo": "image\\genshin\\enemy\\boss\\Bathysmal_Vishap_Herd.png",
+        "type": "Boss",
+        "level": "Hard",
+        "exp": "100",
+        "health": "100",
+        "dmg": "80"
+    },
+    {
+        "id": "100",
+        "name": "Golden Wolflord",
+        "photo": "image\\genshin\\enemy\\boss\\Golden_Wolflord.png",
+        "type": "Boss",
+        "level": "Hard",
+        "exp": "100",
+        "health": "100",
+        "dmg": "80"
+    },
+    {
+        "id": "101",
+        "name": "Primo Geovishap",
+        "photo": "image\\genshin\\enemy\\boss\\Primo_Geovishap.png",
+        "type": "Boss",
+        "level": "Hard",
+        "exp": "100",
+        "health": "100",
+        "dmg": "80"
+    },
+    {
+        "id": "102",
+        "name": "Pyro Regisvine",
+        "photo": "image\\genshin\\enemy\\boss\\Pyro_Regisvine.png",
+        "type": "Boss",
+        "level": "Hard",
+        "exp": "100",
+        "health": "100",
+        "dmg": "80"
+    },
+    {
+        "id": "103",
+        "name": "Maguu Kenki",
+        "photo": "image\\genshin\\enemy\\boss\\Maguu_Kenki.png",
+        "type": "Boss",
+        "level": "Hard",
+        "exp": "100",
+        "health": "100",
+        "dmg": "80"
+    },
+    {
+        "id": "104",
+        "name": "Thunder Manifestation",
+        "photo": "image\\genshin\\enemy\\boss\\Thunder_Manifestation.png",
+        "type": "Boss",
+        "level": "Hard",
+        "exp": "100",
+        "health": "100",
+        "dmg": "80"
+    }
+]

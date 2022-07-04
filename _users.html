@@ -1,0 +1,108 @@
+<template id="users">
+    <div>
+        <h1>Users Management</h1>
+
+        <p>
+            <p>Search Username : </p>
+            <input type="search" v-model.trim="q" v-focus ref1="q" placeholder="Username">
+        </p>
+
+        <p>
+            {{ $root.users.length }} user(s)
+        </p>
+
+        <table class="table">
+            <tr>
+                <th @click="sort('id')" :class="css('id')">Username</th>
+                <th @click="sort('character')" :class="css('character')">Character Name</th>
+                <th @click="sort('health')" :class="css('health')">Health</th>
+                <th @click="sort('damage')" :class="css('damage')">Damage</th>
+                <th @click="sort('level')" :class="css('level')">Level</th>
+                <th @click="sort('exp')" :class="css('exp')">Exp</th>
+                <th @click="sort('weapon')" :class="css('weapon')">Weapon</th>
+            </tr>
+            <tr v-for="f of result">
+                <td>{{ f.id }}</td>
+                <td>{{ f.character }}</td>
+                <td>{{ f.health }}</td>
+                <td>{{ f.damage }}</td>
+                <td>{{ f.level }}</td>
+                <td>{{ f.exp }}</td>
+                <td style="position: relative;">
+                    {{ f.weapon }}
+                    <img :src="f.photo" class="tr">
+                </td>
+            </tr>
+        </table>
+    </div>
+</template>
+
+<script>
+    Vue.component('users', {
+        template: '#users',
+        data: () => ({
+            q: '',
+            field: 'id',
+            reverse: false
+        }),
+        computed: {
+            result() {
+                let arr = this.$root.users.slice(0);
+                let q   = this.q.toUpperCase();
+                let f   = this.field;
+
+                arr = arr.filter(s => s.id.toUpperCase().includes(q));
+                
+                switch (f) {
+                    case 'character':
+                        arr.sort((a, b) => a[f].localeCompare(b[f]));
+                        break;
+                    case 'health':
+                        arr.sort((a, b) => a[f] - b[f]);
+                        break;
+                    case 'damage':
+                        arr.sort((a, b) => a[f] - b[f]);
+                        break;
+                    case 'level':
+                        arr.sort((a, b) => a[f] - b[f]);
+                        break;
+                    case 'exp':
+                        arr.sort((a, b) => a[f] - b[f]);
+                        break; 
+                    case 'weapon':
+                        arr.sort((a, b) => a[f].localeCompare(b[f]));
+                        break;  
+                    default:
+                        arr.sort((a, b) => a[f].localeCompare(b[f]));
+                        break;
+                }
+
+                if (this.reverse) {
+                    arr.reverse();
+                }
+
+                return arr;
+            }
+        },
+        methods: {
+            sort(f) {
+                if (f == this.field) {
+                    this.reverse = !this.reverse;
+                }
+                else {
+                    this.reverse = false;
+                }
+                this.field = f;
+            },
+            css(f) {
+                if (f == this.field) {
+                    return this.reverse ? 'desc' : 'asc';
+                }
+            },
+        },
+
+        created() {
+            document.title = 'Users Management';
+        }
+    });
+</script>
